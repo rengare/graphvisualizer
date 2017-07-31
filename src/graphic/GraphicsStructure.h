@@ -9,8 +9,8 @@ struct VertexData
 {
 	vec3 vertexPosition;
 	vec4 color;
-	float dx = 0, dy = 0, dz = 0;
 	float size;
+	float dx = 0, dy = 0, dz = 0;
 
 	VertexData(){};
 

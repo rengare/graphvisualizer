@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdio.h>      /* printf, scanf, NULL */
+#include <stdlib.h>  
 
 #include <glad/glad.h>
 

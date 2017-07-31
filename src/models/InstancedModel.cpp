@@ -16,7 +16,6 @@ InstancedModel::~InstancedModel()
 {
 }
 
-
 void InstancedModel::AddInstanced(VertexData data)
 {
     (*bufferVertices).push_back(data);
@@ -28,7 +27,6 @@ void InstancedModel::AddInstanced(vector<VertexData> *data)
     bufferVertices = data;
     AddDataToBuffer();
 }
-
 
 void InstancedModel::ShouldBindBuffers()
 {
@@ -56,11 +54,16 @@ void InstancedModel::BindInstancedBuffers()
     GLuint vbo = 0;
     // GLuint ibo = 0;
 
+    glGenBuffers(1, &structDataSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, structDataSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(VertexData), &(*bufferVertices)[0], GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, structDataSSBO);
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, structDataSSBO);
     glBufferData(GL_ARRAY_BUFFER, (*bufferVertices).size() * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 
     int positionLocation = glGetAttribLocation(shaderProgram, "in_position");
@@ -87,7 +90,7 @@ void InstancedModel::BindInstancedBuffers()
 
     this->vao = vao;
     this->vbo = vbo;
-    this->vbos.push_back(vbo);
+    this->vbos.push_back(structDataSSBO);
 
     bounded = true;
 }
@@ -139,6 +142,7 @@ void InstancedModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &v
     }
 }
 
-vector<VertexData>* InstancedModel::GetVertexData(){
+vector<VertexData> *InstancedModel::GetVertexData()
+{
     return this->bufferVertices;
 }

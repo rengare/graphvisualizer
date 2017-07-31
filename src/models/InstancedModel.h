@@ -64,5 +64,7 @@ class InstancedModel
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec4 color;
+
+	GLuint structDataSSBO;
 };
 #endif // !GRAPH_InstancedModelFromFile

@@ -9,6 +9,11 @@ ComputeShader::ComputeShader(string shaderFile)
         Logger::LogError("cant load shaders");
     };
 
+	if (!Link())
+	{
+		Logger::LogError("cant link shader");
+	};
+
     Logger::Log("Compute shader program init correctly", "computeshader.cpp");
 }
 
@@ -64,4 +69,20 @@ bool ComputeShader::Compile(GLuint &loadedShader, const char *source)
 void ComputeShader::AttachCompiledShader(GLuint &compiledShader)
 {
     glAttachShader(shaderProgram, compiledShader);
+}
+
+bool ComputeShader::Link()
+{
+	glLinkProgram(shaderProgram);
+	GLint isLinked;
+	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &isLinked);
+    GLint result = GL_FALSE;
+    int infoLogLength;
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &result);
+    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &infoLogLength);
+    char * programErrorMessage = (char*)calloc(infoLogLength, sizeof(char));
+    glGetProgramInfoLog(shaderProgram, infoLogLength, NULL, &(programErrorMessage[0]));
+    fprintf(stdout, "programErrorMessage: %s\n", programErrorMessage);
+	return isLinked;
 }
