@@ -4,64 +4,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-struct Position
-{
-	glm::vec3 position;
-
-	Position()
-	{
-	}
-
-	Position(const glm::vec3 &pos)
-	{
-		position = pos;
-	}
-
-	void SetPosition(float x, float y, float z)
-	{
-		position.x = x;
-		position.y = y;
-		position.z = z;
-	}
-};
-
-struct Color
-{
-	glm::vec4 color;
-
-	Color()
-	{
-	}
-
-	Color(const glm::vec4 &col)
-	{
-		color = col;
-	}
-
-	void SetColor(float r, float g, float b, float aplha)
-	{
-		color.r = r;
-		color.g = g;
-		color.b = b;
-		color.a = aplha;
-	}
-};
-
+using namespace glm;
 struct VertexData
 {
-	Position vertexPosition;
-	Color color;
+	vec3 vertexPosition;
+	vec4 color;
 	float dx = 0, dy = 0, dz = 0;
 	float size;
 
 	VertexData(){};
 
-	VertexData(Position pos)
+	VertexData(vec3 pos)
 	{
 		vertexPosition = pos;
 	}
 
-	VertexData(Position pos, Color col)
+	VertexData(vec3 pos, vec4 col)
 	{
 		vertexPosition = pos;
 		color = col;

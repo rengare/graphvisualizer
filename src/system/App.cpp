@@ -99,9 +99,9 @@ void App::Fruchterman_Reingold()
         {
             if (i != j)
             {
-                float xDist = (*nodesData)[i].vertexPosition.position.x - (*nodesData)[j].vertexPosition.position.x;
-                float yDist = (*nodesData)[i].vertexPosition.position.y - (*nodesData)[j].vertexPosition.position.y;
-                float zDist = (*nodesData)[i].vertexPosition.position.z - (*nodesData)[j].vertexPosition.position.z;
+                float xDist = (*nodesData)[i].vertexPosition.x - (*nodesData)[j].vertexPosition.x;
+                float yDist = (*nodesData)[i].vertexPosition.y - (*nodesData)[j].vertexPosition.y;
+                float zDist = (*nodesData)[i].vertexPosition.z - (*nodesData)[j].vertexPosition.z;
                 float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
                 if (dist > 0)
                 {
@@ -120,9 +120,9 @@ void App::Fruchterman_Reingold()
         auto source = (*nodesData)[fromToConnectionIndex[i].from];
         auto target = (*nodesData)[fromToConnectionIndex[i].to];
 
-        float xDist = source.vertexPosition.position.x - target.vertexPosition.position.x;
-        float yDist = source.vertexPosition.position.y - target.vertexPosition.position.y;
-        float zDist = source.vertexPosition.position.z - target.vertexPosition.position.z;
+        float xDist = source.vertexPosition.x - target.vertexPosition.x;
+        float yDist = source.vertexPosition.y - target.vertexPosition.y;
+        float zDist = source.vertexPosition.z - target.vertexPosition.z;
         float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
 
         if (dist > 0)
@@ -144,12 +144,12 @@ void App::Fruchterman_Reingold()
     for (int i = 0; i < nodeSize; i++)
     {
         auto pos = (*nodesData)[i];
-        float d = std::sqrt((pos.vertexPosition.position.x * pos.vertexPosition.position.x + pos.vertexPosition.position.y * pos.vertexPosition.position.y + pos.vertexPosition.position.z * pos.vertexPosition.position.z));
+        float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
         float gf = 0.01f * k * (float)gravity * d;
 
-        pos.dx -= gf * pos.vertexPosition.position.x / d;
-        pos.dy -= gf * pos.vertexPosition.position.y / d;
-        pos.dz -= gf * pos.vertexPosition.position.z / d;
+        pos.dx -= gf * pos.vertexPosition.x / d;
+        pos.dy -= gf * pos.vertexPosition.y / d;
+        pos.dz -= gf * pos.vertexPosition.z / d;
 
         pos.dx += speed;
         pos.dy += speed;
@@ -159,12 +159,18 @@ void App::Fruchterman_Reingold()
 
         if (d > 0)
         {
-            float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-            pos.vertexPosition.position.x = pos.vertexPosition.position.x + pos.dx / d * limitedDist;
-            pos.vertexPosition.position.y = pos.vertexPosition.position.y + pos.dy / d * limitedDist;
+
+            #ifdef _WIN32
+                float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+            #else
+                float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+            #endif
+                            
+            pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
+            pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
             if (config.graphType3d)
             {
-                pos.vertexPosition.position.z = pos.vertexPosition.position.z + pos.dz / d * limitedDist;
+                pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
             }
         }
         (*nodesData)[i] = pos;

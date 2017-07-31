@@ -1,6 +1,9 @@
 #ifndef APP_H
 #define APP_H
-#define min(a,b)  ((a < b) ? a : b)
+
+#ifdef _WIN32
+  #define min(a,b)  ((a < b) ? a : b)
+#endif
 
 #include <glad/glad.h>
 #include <SDL2/SDL.h>

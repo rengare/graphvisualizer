@@ -12,26 +12,10 @@ InstancedModel::InstancedModel(int shaderProgram)
     Create("");
 }
 
-InstancedModel::InstancedModel(string fileName, string textureName, GLuint texture, int shaderProgram)
-{
-    this->shaderProgram = shaderProgram;
-    this->textureName = textureName;
-    SetTexture(textureName, texture);
-
-    Create(fileName);
-}
-
 InstancedModel::~InstancedModel()
 {
 }
 
-void InstancedModel::AddInstanced(Position position)
-{
-    VertexData data;
-    data.vertexPosition = position;
-    (*bufferVertices).push_back(data);
-    AddDataToBuffer();
-}
 
 void InstancedModel::AddInstanced(VertexData data)
 {
@@ -45,20 +29,6 @@ void InstancedModel::AddInstanced(vector<VertexData> *data)
     AddDataToBuffer();
 }
 
-void InstancedModel::AddInstanced(Position position, Color color)
-{
-    this->AddInstanced(position, color, 1);
-}
-
-void InstancedModel::AddInstanced(Position position, Color color, int size)
-{
-    VertexData data;
-    data.vertexPosition = position;
-    data.color = color;
-    data.size = size;
-    (*bufferVertices).push_back(data);
-    AddDataToBuffer();
-}
 
 void InstancedModel::ShouldBindBuffers()
 {
@@ -70,7 +40,7 @@ void InstancedModel::ShouldBindBuffers()
 
 glm::vec3 InstancedModel::GetPosition(int index)
 {
-    return (*bufferVertices)[index].vertexPosition.position;
+    return (*bufferVertices)[index].vertexPosition;
 }
 
 void InstancedModel::AddDataToBuffer()
@@ -152,7 +122,7 @@ void InstancedModel::Update()
 
 void InstancedModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-    if (bounded)
+    if (bounded && isVisible)
     {
         glUseProgram(shaderProgram);
         glm::vec3 lightPos = cameraPosition;

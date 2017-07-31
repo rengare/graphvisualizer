@@ -2,26 +2,28 @@
 #define GRAPH_InstancedModelFromFile
 
 #include <iostream>
-#include "../models/drawable/Model.h"
+#include <vector>
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <map>
+
 #include "../graphic/GraphicsStructure.h"
 #include "../helper/RandomNumberGenerator.h"
 
-class InstancedModel: public Model
+using namespace std;
+class InstancedModel
 {
 
-public:
+  public:
 	InstancedModel();
 	InstancedModel(int shaderProgram);
-	InstancedModel(string fileName, string textureName, GLuint texture, int shaderProgram);
 	~InstancedModel();
 
-	void AddInstanced(Position position);
-	void AddInstanced(Position position, Color color);
-	void AddInstanced(Position position, Color color, int size);
-	void AddInstanced(vector<VertexData>* data);
+	void AddInstanced(vector<VertexData> *data);
 	void AddInstanced(VertexData data);
 
-	vector<VertexData>* GetVertexData();
+	vector<VertexData> *GetVertexData();
 
 	void ShouldBindBuffers();
 	void AddDataToBuffer();
@@ -29,24 +31,38 @@ public:
 	void UnbindInstancedBuffers();
 	int GetInstancedSize();
 	void SetDrawingMode(GLenum mode);
-	
-	virtual glm::vec3 GetPosition(int index) override;
 
-	virtual void Draw(const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix, const glm::vec3& cameraPosition) override;
-	virtual void Update() override;
-	
+	glm::vec3 GetPosition(int index);
+
+	void Draw(const glm::mat4 &projectionMatrix, const glm::mat4 &viewMatrix, const glm::vec3 &cameraPosition);
+	void Update();
+
 	bool isVisible = true;
 
-private:
+  private:
 	void Create(string fileName);
 
-private:
-	glm::vec3 rotation, rotation_speed, rotation_sin;
+  private:
+	glm::vec3 rotation_speed, rotation_sin;
 
-	vector<VertexData>* bufferVertices;
+	vector<VertexData> *bufferVertices;
 
 	bool bounded = false;
 	GLenum drawingMode = GL_POINTS;
 	GLuint vbo;
+
+	GLuint vao;
+	vector<GLuint> vbos;
+	GLuint shaderProgram;
+
+	string textureName;
+	string modelPath;
+	string modelName;
+	string modelFileName;
+	map<string, GLuint> textures;
+
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec4 color;
 };
 #endif // !GRAPH_InstancedModelFromFile

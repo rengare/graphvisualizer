@@ -38,11 +38,8 @@ set(SOURCE_FILES
         src/graphic/ComputeShader.cpp src/graphic/ComputeShader.h
         src/graphic/Renderer.cpp src/graphic/Renderer.h
         src/models/InstancedModel.cpp src/models/InstancedModel.h
-        src/models/drawable/Model.cpp src/models/drawable/Model.h
         src/graphic/camera/Camera.cpp src/graphic/camera/Camera.h
 
-        src/models/drawable/IDrawableObject.h
-        
         src/system/App.cpp src/system/App.h
         src/main.cpp
         # src/test.cpp

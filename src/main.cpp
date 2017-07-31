@@ -106,20 +106,20 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
-        nodeData[i].vertexPosition.position.x = RandomNumberGenerator(0, 10) / 10.f;
-        nodeData[i].vertexPosition.position.y = RandomNumberGenerator(0, 10) / 10.f;
+        nodeData[i].vertexPosition.x = RandomNumberGenerator(0, 10) / 10.f;
+        nodeData[i].vertexPosition.y = RandomNumberGenerator(0, 10) / 10.f;
         if (config.graphType3d)
         {
-            nodeData[i].vertexPosition.position.z = RandomNumberGenerator(0, 10) / 10.f;
+            nodeData[i].vertexPosition.z = RandomNumberGenerator(0, 10) / 10.f;
         }
         else
         {
-            nodeData[i].vertexPosition.position.z = 0;
+            nodeData[i].vertexPosition.z = 0;
         }
-        nodeData[i].color.color.r = RandomNumberGenerator(1, 10) / 10.f;
-        nodeData[i].color.color.g = RandomNumberGenerator(1, 10) / 10.f;
-        nodeData[i].color.color.b = RandomNumberGenerator(1, 10) / 10.f;
-        nodeData[i].color.color.a = 1;
+        nodeData[i].color.r = RandomNumberGenerator(1, 10) / 10.f;
+        nodeData[i].color.g = RandomNumberGenerator(1, 10) / 10.f;
+        nodeData[i].color.b = RandomNumberGenerator(1, 10) / 10.f;
+        nodeData[i].color.a = 1;
         nodeData[i].size = RandomNumberGenerator(10, 50);
         hostArrayIndex += 7;
     }
