@@ -1,0 +1,23 @@
+{
+    "width": 1280,
+    "height": 620,
+    "positionX": 400,
+    "positionY": 100,
+    "isVsyncEnabled": true,
+    "name": "Graph visualizer",
+    "red": 0,
+    "green": 0,
+    "blue": 0,
+    "randomLength": 2000000,
+    "range": 1000,
+    "skip": 2,
+    "graphType3d": true,
+    "showEdge": false,
+    "nodeManagerName": "nodes",
+    "nodeShaderVertexPath": "res/shaders/circle.vert",
+    "nodeShaderFragmentPath": "res/shaders/circle.frag",
+    "lineManagerName": "lines",
+    "lineShaderVertexPath": "res/shaders/line.vert",
+    "lineShaderFragmentPath": "res/shaders/line.frag",
+    "edgeInput": "array.edges"
+}

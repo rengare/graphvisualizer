@@ -1,0 +1,14 @@
+//
+// Created by ren on 15.10.16.
+//
+
+#ifndef GRAPHVISUALIZER_SETTINGSSDL_H
+#define GRAPHVISUALIZER_SETTINGSSDL_H
+
+
+class SettingsSDL {
+
+};
+
+
+#endif //GRAPHVISUALIZER_SETTINGSSDL_H

@@ -1,0 +1,13 @@
+.vs/
+.vscode/
+*.db
+*.opendb
+*.filters
+*.user
+.idea/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+build/
+sdl2-linux
+sdl2-windows

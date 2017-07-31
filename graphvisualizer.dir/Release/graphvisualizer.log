@@ -1,0 +1,33 @@
+﻿  Building Custom Rule C:/Users/gorec/workspace/cpp/graphvisualizer/CMakeLists.txt
+  CMake does not need to re-run because C:/Users/gorec/workspace/cpp/graphvisualizer/CMakeFiles/generate.stamp is up-to-date.
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_sdl_gl3.cpp
+  InputManager.cpp
+  SettingsSDL.cpp
+  SettingsOpengl.cpp
+  Shader.cpp
+  ComputeShader.cpp
+  Renderer.cpp
+  InstancedModel.cpp
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\models\InstancedModel.cpp(58): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  Model.cpp
+  Camera.cpp
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\graphic\camera\Camera.cpp(9): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  App.cpp
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(92): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(98): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(118): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(144): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(174): warning C4018: '<': signed/unsigned mismatch
+  main.cpp
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(68): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(76): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(105): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(107): warning C4018: '<': signed/unsigned mismatch
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(123): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\gorec\workspace\cpp\graphvisualizer\src\main.cpp(127): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  glad.c
+  graphvisualizer.vcxproj -> C:\Users\gorec\workspace\cpp\graphvisualizer\build\windows\Release\graphvisualizer.exe
