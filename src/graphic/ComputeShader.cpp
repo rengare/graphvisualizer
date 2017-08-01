@@ -86,3 +86,8 @@ bool ComputeShader::Link()
     fprintf(stdout, "programErrorMessage: %s\n", programErrorMessage);
 	return isLinked;
 }
+
+GLuint ComputeShader::GetShader()
+{
+    return shaderProgram;
+}

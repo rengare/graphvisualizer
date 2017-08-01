@@ -23,6 +23,7 @@
 #include "../imgui/imgui_impl_sdl_gl3.h"
 
 #include "../models/InstancedModel.h"
+#include "../models/GraphModel.h"
 
 using namespace std;
 
@@ -52,6 +53,7 @@ public:
 
   InstancedModel nodes;
   InstancedModel edges;
+  GraphModel graphModel;
 
 private:
   bool InitSdl();
@@ -77,6 +79,8 @@ private:
   Camera *camera;
   glm::mat4 projectionMatrix;
   glm::mat4 viewMatrix;
+
+
   int nodeCount;
   int nodeIndex = 0;
   int currentNodeIteration = 0;

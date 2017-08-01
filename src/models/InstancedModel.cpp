@@ -43,9 +43,7 @@ glm::vec3 InstancedModel::GetPosition(int index)
 
 void InstancedModel::AddDataToBuffer()
 {
-    ShouldBindBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, (*bufferVertices).size() * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+    BindInstancedBuffers();
 }
 
 void InstancedModel::BindInstancedBuffers()
@@ -90,19 +88,12 @@ void InstancedModel::BindInstancedBuffers()
 
     this->vao = vao;
     this->vbo = vbo;
-    this->vbos.push_back(structDataSSBO);
 
     bounded = true;
 }
 
 void InstancedModel::UnbindInstancedBuffers()
 {
-    if (vbos.size() > 0)
-    {
-        glDeleteBuffers(vbos.size(), &vbos[0]);
-        glDeleteVertexArrays(1, &vao);
-        vbos.clear();
-    }
 }
 
 int InstancedModel::GetInstancedSize()
@@ -113,6 +104,11 @@ int InstancedModel::GetInstancedSize()
 void InstancedModel::SetDrawingMode(GLenum mode)
 {
     drawingMode = mode;
+}
+
+void InstancedModel::AddComputeShader(GLuint shader)
+{
+    computeShader = shader;
 }
 
 void InstancedModel::Create(string fileName)
@@ -127,18 +123,24 @@ void InstancedModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &v
 {
     if (bounded && isVisible)
     {
-        glUseProgram(shaderProgram);
-        glm::vec3 lightPos = cameraPosition;
-        lightPos[2] = -lightPos[2];
-
         glBindVertexArray(vao);
 
+        if (computeShader)
+        {
+            glUseProgram(computeShader);
+        }
+
+        glDispatchCompute(128, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
+        glUseProgram(shaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view_matrix"), 1, false, &view_matrix[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection_matrix"), 1, false, &projection_matrix[0][0]);
-        glUniform3fv(glGetUniformLocation(shaderProgram, "light_pos"), 1, &lightPos[0]);
 
         glDrawArrays(drawingMode, 0, (*bufferVertices).size());
         //glDrawArrays(GL_TRIANGLES, 0, verticesSize);
+
+        glBindVertexArray(0);
     }
 }
 

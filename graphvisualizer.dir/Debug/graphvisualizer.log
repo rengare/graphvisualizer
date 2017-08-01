@@ -1,8 +1,0 @@
-﻿  App.cpp
-C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(92): warning C4018: '<': signed/unsigned mismatch
-C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(98): warning C4018: '<': signed/unsigned mismatch
-C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(118): warning C4018: '<': signed/unsigned mismatch
-C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(144): warning C4018: '<': signed/unsigned mismatch
-C:\Users\gorec\workspace\cpp\graphvisualizer\src\system\App.cpp(174): warning C4018: '<': signed/unsigned mismatch
-  glad.c
-  graphvisualizer.vcxproj -> C:\Users\gorec\workspace\cpp\graphvisualizer\build\windows\Debug\graphvisualizer.exe

@@ -31,6 +31,7 @@ class InstancedModel
 	void UnbindInstancedBuffers();
 	int GetInstancedSize();
 	void SetDrawingMode(GLenum mode);
+	void AddComputeShader(GLuint shader);
 
 	glm::vec3 GetPosition(int index);
 
@@ -54,6 +55,7 @@ class InstancedModel
 	GLuint vao;
 	vector<GLuint> vbos;
 	GLuint shaderProgram;
+	GLuint computeShader;
 
 	string textureName;
 	string modelPath;

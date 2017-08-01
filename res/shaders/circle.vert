@@ -1,8 +1,8 @@
 #version 430
 
-in vec3 in_position;
-in vec4 in_color;
-in float in_size;
+layout(location=0) in vec3 in_position;
+layout(location=1) in vec4 in_color;
+layout(location=2) in float in_size;
 
 uniform mat4 projection_matrix, view_matrix;
 
@@ -11,7 +11,6 @@ out vec3 centerPosition;
 
 void main()
 {
-
 	color = in_color;
 
 	float scale = 500;

@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     ComputeShader computeShader("res/shaders/fruchtermanreingold.comp");
 
     auto nodes = new InstancedModel(nodeShader.GetShaderProgram());
-
+    nodes->AddComputeShader(computeShader.GetShader());
     auto lines = new InstancedModel(lineShader.GetShaderProgram());
 
     lines->isVisible = config.showEdge;
@@ -138,6 +138,8 @@ int main(int argc, char *argv[])
 
     app->nodes = *nodes;
     app->edges = *lines;
+    auto graph = new GraphModel(nodeShader.GetShaderProgram(), computeShader.GetShader(), &nodeData);
+    app->graphModel = *graph;
 
     app->connections = &connections;
     app->fromToConnectionIndex = fromToConnectionIndex;

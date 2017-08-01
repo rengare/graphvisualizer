@@ -73,131 +73,132 @@ void App::Run()
 void App::Update()
 {
     ProcessInput();
-    Fruchterman_Reingold();
+    // Fruchterman_Reingold();
 
     camera->Update();
 }
 
-void App::Fruchterman_Reingold()
-{
-    auto nodesData = nodes.GetVertexData();
-    auto nodeSize = nodesData->size();
+// void App::Fruchterman_Reingold()
+// {
+//     auto nodesData = nodes.GetVertexData();
+//     auto nodeSize = nodesData->size();
 
-    auto edgesData = edges.GetVertexData();
-    (*edgesData).clear();
+//     auto edgesData = edges.GetVertexData();
+//     (*edgesData).clear();
 
-    float maxDisplace = (float)(std::sqrt(AREA_MULTIPLICATOR * area) / 10.f); // Déplacement limite : on peut le calibrer...
-    float k = (float)std::sqrt((AREA_MULTIPLICATOR * area) / (1.f + nodeSize));
+//     float maxDisplace = (float)(std::sqrt(AREA_MULTIPLICATOR * area) / 10.f); // Déplacement limite : on peut le calibrer...
+//     float k = (float)std::sqrt((AREA_MULTIPLICATOR * area) / (1.f + nodeSize));
 
-    for (int i = 0; i < nodeSize; i++)
-    {
-        (*nodesData)[i].dx = 0;
-        (*nodesData)[i].dy = 0;
-        (*nodesData)[i].dz = 0;
+//     for (int i = 0; i < nodeSize; i++)
+//     {
+//         (*nodesData)[i].dx = 0;
+//         (*nodesData)[i].dy = 0;
+//         (*nodesData)[i].dz = 0;
 
-        for (int j = 0; j < nodeSize; j++)
-        {
-            if (i != j)
-            {
-                float xDist = (*nodesData)[i].vertexPosition.x - (*nodesData)[j].vertexPosition.x;
-                float yDist = (*nodesData)[i].vertexPosition.y - (*nodesData)[j].vertexPosition.y;
-                float zDist = (*nodesData)[i].vertexPosition.z - (*nodesData)[j].vertexPosition.z;
-                float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-                if (dist > 0)
-                {
-                    float repulsive = (k * k) / dist;
-                    (*nodesData)[i].dx += xDist / dist * repulsive;
-                    (*nodesData)[i].dy += yDist / dist * repulsive;
-                    (*nodesData)[i].dz += zDist / dist * repulsive;
-                }
-            }
-        }
-    }
+//         for (int j = 0; j < nodeSize; j++)
+//         {
+//             if (i != j)
+//             {
+//                 float xDist = (*nodesData)[i].vertexPosition.x - (*nodesData)[j].vertexPosition.x;
+//                 float yDist = (*nodesData)[i].vertexPosition.y - (*nodesData)[j].vertexPosition.y;
+//                 float zDist = (*nodesData)[i].vertexPosition.z - (*nodesData)[j].vertexPosition.z;
+//                 float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+//                 if (dist > 0)
+//                 {
+//                     float repulsive = (k * k) / dist;
+//                     (*nodesData)[i].dx += xDist / dist * repulsive;
+//                     (*nodesData)[i].dy += yDist / dist * repulsive;
+//                     (*nodesData)[i].dz += zDist / dist * repulsive;
+//                 }
+//             }
+//         }
+//     }
 
-    auto edgeSize = fromToConnectionIndex.size();
-    for (int i = 0; i < edgeSize; i++)
-    {
-        auto source = (*nodesData)[fromToConnectionIndex[i].from];
-        auto target = (*nodesData)[fromToConnectionIndex[i].to];
+//     auto edgeSize = fromToConnectionIndex.size();
+//     for (int i = 0; i < edgeSize; i++)
+//     {
+//         auto source = (*nodesData)[fromToConnectionIndex[i].from];
+//         auto target = (*nodesData)[fromToConnectionIndex[i].to];
 
-        float xDist = source.vertexPosition.x - target.vertexPosition.x;
-        float yDist = source.vertexPosition.y - target.vertexPosition.y;
-        float zDist = source.vertexPosition.z - target.vertexPosition.z;
-        float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+//         float xDist = source.vertexPosition.x - target.vertexPosition.x;
+//         float yDist = source.vertexPosition.y - target.vertexPosition.y;
+//         float zDist = source.vertexPosition.z - target.vertexPosition.z;
+//         float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
 
-        if (dist > 0)
-        {
-            float atractive = (dist * dist) / k;
-            source.dx -= xDist / dist * atractive;
-            source.dy -= yDist / dist * atractive;
-            source.dz -= zDist / dist * atractive;
+//         if (dist > 0)
+//         {
+//             float atractive = (dist * dist) / k;
+//             source.dx -= xDist / dist * atractive;
+//             source.dy -= yDist / dist * atractive;
+//             source.dz -= zDist / dist * atractive;
 
-            target.dx += xDist / dist * atractive;
-            target.dy += yDist / dist * atractive;
-            target.dz += zDist / dist * atractive;
+//             target.dx += xDist / dist * atractive;
+//             target.dy += yDist / dist * atractive;
+//             target.dz += zDist / dist * atractive;
 
-            (*nodesData)[fromToConnectionIndex[i].from] = source;
-            (*nodesData)[fromToConnectionIndex[i].to] = target;
-        }
-    }
+//             (*nodesData)[fromToConnectionIndex[i].from] = source;
+//             (*nodesData)[fromToConnectionIndex[i].to] = target;
+//         }
+//     }
 
-    for (int i = 0; i < nodeSize; i++)
-    {
-        auto pos = (*nodesData)[i];
-        float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
-        float gf = 0.01f * k * (float)gravity * d;
+//     for (int i = 0; i < nodeSize; i++)
+//     {
+//         auto pos = (*nodesData)[i];
+//         float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
+//         float gf = 0.01f * k * (float)gravity * d;
 
-        pos.dx -= gf * pos.vertexPosition.x / d;
-        pos.dy -= gf * pos.vertexPosition.y / d;
-        pos.dz -= gf * pos.vertexPosition.z / d;
+//         pos.dx -= gf * pos.vertexPosition.x / d;
+//         pos.dy -= gf * pos.vertexPosition.y / d;
+//         pos.dz -= gf * pos.vertexPosition.z / d;
 
-        pos.dx += speed;
-        pos.dy += speed;
-        pos.dz += speed;
+//         pos.dx += speed;
+//         pos.dy += speed;
+//         pos.dz += speed;
 
-        d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
+//         d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
 
-        if (d > 0)
-        {
+//         if (d > 0)
+//         {
 
-            #ifdef _WIN32
-                float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-            #else
-                float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-            #endif
+//             #ifdef _WIN32
+//                 float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+//             #else
+//                 float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+//             #endif
                             
-            pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
-            pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
-            if (config.graphType3d)
-            {
-                pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
-            }
-        }
-        (*nodesData)[i] = pos;
-    }
+//             pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
+//             pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
+//             if (config.graphType3d)
+//             {
+//                 pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
+//             }
+//         }
+//         (*nodesData)[i] = pos;
+//     }
 
-    // edgeSize = (*connections).size();
-    for (int i = 0; i < fromToConnectionIndex.size(); i++)
-    {
-        auto source = (*nodesData)[fromToConnectionIndex[i].from];
-        auto target = (*nodesData)[fromToConnectionIndex[i].to];
+//     // edgeSize = (*connections).size();
+//     for (int i = 0; i < fromToConnectionIndex.size(); i++)
+//     {
+//         auto source = (*nodesData)[fromToConnectionIndex[i].from];
+//         auto target = (*nodesData)[fromToConnectionIndex[i].to];
 
-        (*edgesData).push_back(source);
-        (*edgesData).push_back(target);
-    }
-    nodes.AddInstanced(nodesData);
-    edges.AddInstanced(edgesData);
-}
+//         (*edgesData).push_back(source);
+//         (*edgesData).push_back(target);
+//     }
+//     nodes.AddInstanced(nodesData);
+//     edges.AddInstanced(edgesData);
+// }
 
 void App::Draw()
 {
     renderer->BeginDraw();
     auto cameraPos = camera->GetPosition();
 
-    edges.isVisible = config.showEdge;
+    // edges.isVisible = config.showEdge;
+    // nodes.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
+    // edges.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
-    nodes.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
-    edges.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
+    graphModel.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
     RenderGui();
     renderer->EndDraw();

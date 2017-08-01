@@ -16,6 +16,8 @@ class ComputeShader
 {
 public:
     ComputeShader(string shaderFile);
+	GLuint GetShader();
+
 private:
 	bool LoadShader(string fileName);
 
