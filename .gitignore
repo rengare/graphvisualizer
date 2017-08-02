@@ -11,3 +11,6 @@ cmake_install.cmake
 build/
 sdl2-linux
 sdl2-windows
+sdl2/
+sdl2win32
+graphvisualizer.dir
