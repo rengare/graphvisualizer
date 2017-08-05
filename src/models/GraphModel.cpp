@@ -50,11 +50,13 @@ GraphModel::GraphModel(GLuint shader, GLuint compute, vector<VertexData> *data)
 void GraphModel::Update() 
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-
+	
 	glUseProgram(computeShader);
+	glUniform1iv(glGetUniformLocation(computeShader, "graphDataSize"), 1, &size);
 
 	glDispatchCompute(size / 256, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
 	//VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
@@ -70,6 +72,8 @@ void GraphModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection_matrix"), 1, false, &projection_matrix[0][0]);
 
 	glDrawArrays(drawingMode, 0, size);
+
+	glBindVertexArray(0);
 }
 
 void GraphModel::Clear() 

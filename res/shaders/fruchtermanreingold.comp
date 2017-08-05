@@ -11,6 +11,8 @@ struct GraphicData
     float dz;
 };
 
+layout( location = 1 ) uniform int graphDataSize;
+
 layout (std430, binding = 0) buffer DataBuffer {
 	GraphicData data[];
 };
@@ -27,7 +29,7 @@ highp float rand(vec2 co)
 
 void main(void)
 {
-    for(int i = 0; i< 6400; i++){
+    for(int i = 0; i < graphDataSize; i++){
         data[i].position.x += 0.001;
     }
 
