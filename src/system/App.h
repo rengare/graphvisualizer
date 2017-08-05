@@ -51,8 +51,8 @@ public:
   std::vector<Connections> *connections;
   std::vector<ConnectionIndices> fromToConnectionIndex;
 
-  InstancedModel nodes;
-  InstancedModel edges;
+  //InstancedModel nodes;
+  //InstancedModel edges;
   GraphModel graphModel;
 
 private:

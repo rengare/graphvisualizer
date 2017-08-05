@@ -23,6 +23,9 @@ class GraphModel
     void Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition);
     
     void Update();
+
+	void Clear();
+	
     vector<VertexData> *GetVertexData();
 
     bool isVisible = true;
@@ -30,9 +33,10 @@ class GraphModel
   private:
     vector<VertexData> *bufferVertices;
     GLenum drawingMode = GL_POINTS;
+	
+	GLint bufMask = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
 
     GLuint vao;
-    GLuint objectBuffer;
     GLuint ssbo;
 
     GLuint shaderProgram;

@@ -7,23 +7,12 @@
 using namespace glm;
 struct VertexData
 {
-	vec3 vertexPosition;
+	vec4 vertexPosition;
 	vec4 color;
 	float size;
 	float dx = 0, dy = 0, dz = 0;
 
 	VertexData(){};
-
-	VertexData(vec3 pos)
-	{
-		vertexPosition = pos;
-	}
-
-	VertexData(vec3 pos, vec4 col)
-	{
-		vertexPosition = pos;
-		color = col;
-	}
 };
 
 struct Connections

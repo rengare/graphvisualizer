@@ -75,6 +75,8 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
+	graphModel.Update();
+
     camera->Update();
 }
 
@@ -395,17 +397,17 @@ void App::RenderGui()
         ImGui::Checkbox("Show edge", &config.showEdge);
         if (ImGui::InputInt("Find node", &nodeIndex))
         {
-            if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
-            {
-                auto pos = nodes.GetPosition(nodeIndex);
+            //if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
+            //{
+            //    auto pos = nodes.GetPosition(nodeIndex);
 
-                pos *= -0.5;
-                pos.z -= 50;
+            //    pos *= -0.5;
+            //    pos.z -= 50;
 
-                camera->cameraPosition = pos;
-                camera->MakePosition();
-                camera->Forward();
-            }
+            //    camera->cameraPosition = glm::vec3(pos.x, pos.y, pos.z);
+            //    camera->MakePosition();
+            //    camera->Forward();
+            //}
         };
 
         // ImGui::InputInt("SPEED_DIVISOR", &SPEED_DIVISOR);
