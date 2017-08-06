@@ -1,6 +1,6 @@
 #version 430
 
-in vec3 in_position;
+in vec4 in_position;
 in vec4 in_color;
 in float in_size;
 
@@ -13,8 +13,8 @@ void main()
 {
 
 	color = in_color;
-
-    vec4 modelViewPosition = view_matrix * vec4(in_position, 1);
+	vec3 pos = vec3(in_position);
+    vec4 modelViewPosition = view_matrix * vec4(pos, 1);
 	
     // gl_PointSize = 10 * (500 / -modelViewPosition.z);
 	

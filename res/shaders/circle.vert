@@ -16,7 +16,7 @@ void main()
 	float scale = 500;
 	float size = in_size;
 
-	vec3 normalPosition = vec3(in_position.x, in_position.y, in_position.z);
+	vec3 normalPosition = vec3(in_position);
 
     vec4 modelViewPosition = view_matrix * vec4(normalPosition, 1);
 	

@@ -1,37 +1,46 @@
 #include "GraphModel.h"
 
+const int GROUP_SIZE = 256;
+
 GraphModel::GraphModel()
 {
 }
 
 GraphModel::~GraphModel()
 {
-	glDeleteBuffers(1, &ssbo);
+	glDeleteBuffers(1, &nodeSsbo);
 }
 
-GraphModel::GraphModel(GLuint shader, GLuint compute, vector<VertexData> *data)
+GraphModel::GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data)
 {
-	shaderProgram = shader;
-	computeShader = compute;
+	this->nodeShader = nodeShader;
+	this->edgeShader = edgeShader;
+	this->computeShader = computeShader;
+
 	bufferVertices = data;
 
 	size = (*bufferVertices).size();
 
-	glGenBuffers(1, &ssbo);
+	PrepareNodes();
+}
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+void GraphModel::PrepareNodes() 
+{
+	glGenBuffers(1, &nodeSsbo);
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+	glGenVertexArrays(1, &nodeVao);
+	glBindVertexArray(nodeVao);
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, ssbo);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, size * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
-		
 
-	int positionLocation = glGetAttribLocation(shaderProgram, "in_position");
-	int colorLocation = glGetAttribLocation(shaderProgram, "in_color");
-	int sizeLocation = glGetAttribLocation(shaderProgram, "in_size");
+
+	int positionLocation = glGetAttribLocation(nodeShader.GetShaderProgram(), "in_position");
+	int colorLocation = glGetAttribLocation(nodeShader.GetShaderProgram(), "in_color");
+	int sizeLocation = glGetAttribLocation(nodeShader.GetShaderProgram(), "in_size");
 
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
@@ -44,17 +53,22 @@ GraphModel::GraphModel(GLuint shader, GLuint compute, vector<VertexData> *data)
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
+}
+
+void GraphModel::PrepareEdges()
+{
 
 }
 
 void GraphModel::Update() 
 {
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 	
-	glUseProgram(computeShader);
-	glUniform1iv(glGetUniformLocation(computeShader, "graphDataSize"), 1, &size);
+	glUseProgram(computeShader.GetShaderProgram());
 
-	glDispatchCompute(size / 256, 1, 1);
+	glUniform1iv(glGetUniformLocation(computeShader.GetShaderProgram(), "graphDataSize"), 1, &size);
+
+	glDispatchCompute((size / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -64,19 +78,39 @@ void GraphModel::Update()
 
 void GraphModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-	glUseProgram(shaderProgram);
+	DrawNodes(projection_matrix, view_matrix, cameraPosition);
+	DrawEdges(projection_matrix, view_matrix, cameraPosition);
+}
 
-	glBindVertexArray(vao);
+void GraphModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+{
+	glUseProgram(nodeShader.GetShaderProgram());
 
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view_matrix"), 1, false, &view_matrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection_matrix"), 1, false, &projection_matrix[0][0]);
+	glBindVertexArray(nodeVao);
 
-	glDrawArrays(drawingMode, 0, size);
+	glUniformMatrix4fv(glGetUniformLocation(nodeShader.GetShaderProgram(), "view_matrix"), 1, false, &view_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(nodeShader.GetShaderProgram(), "projection_matrix"), 1, false, &projection_matrix[0][0]);
+
+	glDrawArrays(GL_POINTS, 0, size);
+
+	glBindVertexArray(0);
+}
+
+void GraphModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+{
+	glUseProgram(edgeShader.GetShaderProgram());
+
+	glBindVertexArray(nodeVao);
+
+	glUniformMatrix4fv(glGetUniformLocation(edgeShader.GetShaderProgram(), "view_matrix"), 1, false, &view_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(edgeShader.GetShaderProgram(), "projection_matrix"), 1, false, &projection_matrix[0][0]);
+
+	glDrawArrays(GL_LINES, 0, size);
 
 	glBindVertexArray(0);
 }
 
 void GraphModel::Clear() 
 {
-	glDeleteBuffers(1, &ssbo);
+	glDeleteBuffers(1, &nodeSsbo);
 }

@@ -9,6 +9,8 @@
 #include <map>
 
 #include "../graphic/GraphicsStructure.h"
+#include "../graphic/Shader.h"
+#include "../graphic/ComputeShader.h"
 #include "../helper/RandomNumberGenerator.h"
 
 using namespace std;
@@ -18,9 +20,17 @@ class GraphModel
   public:
     GraphModel();
     ~GraphModel();
-    GraphModel(GLuint shader, GLuint compute, vector<VertexData> *data);
+    GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data);
+
+	void PrepareNodes();
+
+	void PrepareEdges();
 
     void Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition);
+
+	void DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition);
+
+	void DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition);
     
     void Update();
 
@@ -36,11 +46,12 @@ class GraphModel
 	
 	GLint bufMask = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
 
-    GLuint vao;
-    GLuint ssbo;
+    GLuint nodeVao;
+    GLuint nodeSsbo;
 
-    GLuint shaderProgram;
-    GLuint computeShader;
+	Shader nodeShader, edgeShader;
+	ComputeShader computeShader;
+
     int size;
 };
 #endif

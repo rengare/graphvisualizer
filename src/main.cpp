@@ -77,21 +77,13 @@ int main(int argc, char *argv[])
     {
         fromTo.from = edgeIndexMap[connections[i].from];
         fromTo.to = edgeIndexMap[connections[i].to];
-        fromToConnectionIndex.push_back(fromTo);
     }
 
     auto app = new App(config);
 
     Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-    Shader lineShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+    Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
     ComputeShader computeShader("res/shaders/fruchtermanreingold.comp");
-
-    //auto nodes = new InstancedModel(nodeShader.GetShaderProgram());
-    //nodes->AddComputeShader(computeShader.GetShader());
-    //auto lines = new InstancedModel(lineShader.GetShaderProgram());
-
-    //lines->isVisible = config.showEdge;
-    //lines->SetDrawingMode(GL_LINES);
 
     Camera *camera = new Camera(config);
     camera->SetCameraVelocity(glm::vec3(10.f));
@@ -134,13 +126,8 @@ int main(int argc, char *argv[])
 
     app->SetNodesCount(uniqueEdge.size() + 1);
 
-	//nodes->AddInstanced(&nodeData);
-    //lines->AddInstanced(&connectionData);
 
-    //app->nodes = *nodes;
-    //app->edges = *lines;
-
-    auto graph = new GraphModel(nodeShader.GetShaderProgram(), computeShader.GetShader(), &nodeData);
+    auto graph = new GraphModel(nodeShader, edgeShader, computeShader, &nodeData);
     app->graphModel = *graph;
 
     app->connections = &connections;
