@@ -1,6 +1,6 @@
 #include "GraphModel.h"
 
-const int GROUP_SIZE = 256;
+const int GROUP_SIZE = 20;
 
 GraphModel::GraphModel()
 {
@@ -11,32 +11,33 @@ GraphModel::~GraphModel()
 	glDeleteBuffers(1, &nodeSsbo);
 }
 
-GraphModel::GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data)
+GraphModel::GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections)
 {
 	this->nodeShader = nodeShader;
 	this->edgeShader = edgeShader;
 	this->computeShader = computeShader;
 
-	bufferVertices = data;
+	this->bufferVertices = data;
+	this->fromToConnections = fromToConnections;
+
 
 	size = (*bufferVertices).size();
+	fromToConnectionSize = (*fromToConnections).size();
 
 	PrepareNodes();
 }
 
 void GraphModel::PrepareNodes() 
 {
-	glGenBuffers(1, &nodeSsbo);
-
 	glGenVertexArrays(1, &nodeVao);
 	glBindVertexArray(nodeVao);
 
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
+	glGenBuffers(1, &nodeSsbo);
+	glGenBuffers(1, &fromToSsbo);
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, size * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
-
 
 	int positionLocation = glGetAttribLocation(nodeShader.GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(nodeShader.GetShaderProgram(), "in_color");
@@ -53,6 +54,14 @@ void GraphModel::PrepareNodes()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
+	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
+
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
+
 }
 
 void GraphModel::PrepareEdges()
@@ -67,6 +76,7 @@ void GraphModel::Update()
 	glUseProgram(computeShader.GetShaderProgram());
 
 	glUniform1iv(glGetUniformLocation(computeShader.GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(computeShader.GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
 
 	glDispatchCompute((size / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);

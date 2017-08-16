@@ -70,13 +70,14 @@ int main(int argc, char *argv[])
         edgeIndexMap[uniqueEdge[i]] = i;
     }
 
-    ConnectionIndices fromTo;
 
     std::vector<ConnectionIndices> fromToConnectionIndex;
     for (int i = 0; i < connections.size(); i++)
     {
+		ConnectionIndices fromTo;
         fromTo.from = edgeIndexMap[connections[i].from];
         fromTo.to = edgeIndexMap[connections[i].to];
+		fromToConnectionIndex.push_back(fromTo);
     }
 
     auto app = new App(config);
@@ -127,11 +128,11 @@ int main(int argc, char *argv[])
     app->SetNodesCount(uniqueEdge.size() + 1);
 
 
-    auto graph = new GraphModel(nodeShader, edgeShader, computeShader, &nodeData);
+    auto graph = new GraphModel(nodeShader, edgeShader, computeShader, &nodeData, &fromToConnectionIndex);
     app->graphModel = *graph;
 
-    app->connections = &connections;
-    app->fromToConnectionIndex = fromToConnectionIndex;
+    //app->connections = &connections;
+    //app->fromToConnectionIndex = fromToConnectionIndex;
 
     app->SetAppState(AppState::RUN);
     app->Run();

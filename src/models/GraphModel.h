@@ -20,7 +20,7 @@ class GraphModel
   public:
     GraphModel();
     ~GraphModel();
-    GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data);
+    GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
 
 	void PrepareNodes();
 
@@ -41,17 +41,21 @@ class GraphModel
     bool isVisible = true;
 
   private:
-    vector<VertexData> *bufferVertices;
+	vector<VertexData> *bufferVertices;
+	vector<ConnectionIndices> *fromToConnections;
+
     GLenum drawingMode = GL_POINTS;
 	
 	GLint bufMask = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
 
     GLuint nodeVao;
     GLuint nodeSsbo;
+	GLuint fromToSsbo;
 
 	Shader nodeShader, edgeShader;
 	ComputeShader computeShader;
 
     int size;
+	int fromToConnectionSize;
 };
 #endif
