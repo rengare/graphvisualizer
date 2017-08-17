@@ -12,7 +12,7 @@ float gravity = 10;
 
 struct GraphicData
 {
-    vec3 position;
+    vec4 position;
     vec4 color;
     float size;
     float dx;
@@ -46,7 +46,7 @@ void main(void)
 
     uint index = gl_GlobalInvocationID.x;
 
-    uint minsize = index * GRROUP_SIZE;
+    uint minsize =  index * GRROUP_SIZE;
     uint maxSize = (index * GRROUP_SIZE) + GRROUP_SIZE;
 
     for(uint i = minsize; i < maxSize; i++ )
@@ -67,77 +67,70 @@ void main(void)
                 data[i].dx += xDist / dist * repulsive;
                 data[i].dy += yDist / dist * repulsive;
                 data[i].dz += zDist / dist * repulsive;
-                
-                
             }
         }
     }
+
+    for (int i = 0; i < connectionSize; i++)
+    {
+        GraphicData source = data[connections[i].from];
+        GraphicData target = data[connections[i].to];
+
+        float xDist = source.position[0] - target.position[0];
+        float yDist = source.position[1] - target.position[1];
+        float zDist = source.position[2] - target.position[2];
+        float dist = sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+
+        if (dist > 0)
+        {
+            float atractive = (dist * dist) / k;
+            source.dx -= xDist / dist * atractive;
+            source.dy -= yDist / dist * atractive;
+            source.dz -= zDist / dist * atractive;
+
+            target.dx += xDist / dist * atractive;
+            target.dy += yDist / dist * atractive;
+            target.dz += zDist / dist * atractive;
+
+            data[connections[i].from] = source;
+            data[connections[i].to] = target;
+        }
+    }
+
+    for (uint i = minsize; i < maxSize; i++)
+    {
+        GraphicData pos = data[i];
+        float d = sqrt((pos.position[0] * pos.position[0] + pos.position[1] * pos.position[1] + pos.position[2] * pos.position[2]));
+        float gf = 0.01 * k * gravity * d;
+
+        pos.dx -= gf * pos.position[0] / d;
+        pos.dy -= gf * pos.position[1] / d;
+        pos.dz -= gf * pos.position[2] / d;
+
+        pos.dx += speed;
+        pos.dy += speed;
+        pos.dz += speed;
+
+        d = sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
+
+        if (d > 0)
+        {
+            float limitedDist = min(maxDisplace * (speed / SPEED_DIVISOR), d);
+                            
+            pos.position[0] = pos.position[0] + pos.dx / d * limitedDist;
+            pos.position[1] = pos.position[1] + pos.dy / d * limitedDist;
+            pos.position[2] = pos.position[2] + pos.dz / d * limitedDist;
+        }
+        data[i] = pos;
+    }
+
 }
 
 // void App::Fruchterman_Reingold()
 // {
 
 //     auto edgeSize = fromToConnectionIndex.size();
-//     for (int i = 0; i < edgeSize; i++)
-//     {
-//         auto source = (*nodesData)[fromToConnectionIndex[i].from];
-//         auto target = (*nodesData)[fromToConnectionIndex[i].to];
 
-//         float xDist = source.vertexPosition.x - target.vertexPosition.x;
-//         float yDist = source.vertexPosition.y - target.vertexPosition.y;
-//         float zDist = source.vertexPosition.z - target.vertexPosition.z;
-//         float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-
-//         if (dist > 0)
-//         {
-//             float atractive = (dist * dist) / k;
-//             source.dx -= xDist / dist * atractive;
-//             source.dy -= yDist / dist * atractive;
-//             source.dz -= zDist / dist * atractive;
-
-//             target.dx += xDist / dist * atractive;
-//             target.dy += yDist / dist * atractive;
-//             target.dz += zDist / dist * atractive;
-
-//             (*nodesData)[fromToConnectionIndex[i].from] = source;
-//             (*nodesData)[fromToConnectionIndex[i].to] = target;
-//         }
-//     }
-
-//     for (int i = 0; i < nodeSize; i++)
-//     {
-//         auto pos = (*nodesData)[i];
-//         float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
-//         float gf = 0.01f * k * (float)gravity * d;
-
-//         pos.dx -= gf * pos.vertexPosition.x / d;
-//         pos.dy -= gf * pos.vertexPosition.y / d;
-//         pos.dz -= gf * pos.vertexPosition.z / d;
-
-//         pos.dx += speed;
-//         pos.dy += speed;
-//         pos.dz += speed;
-
-//         d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
-
-//         if (d > 0)
-//         {
-
-//             #ifdef _WIN32
-//                 float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-//             #else
-//                 float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-//             #endif
-                            
-//             pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
-//             pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
-//             if (config.graphType3d)
-//             {
-//                 pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
-//             }
-//         }
-//         (*nodesData)[i] = pos;
-//     }
 
 //     // edgeSize = (*connections).size();
 //     for (int i = 0; i < fromToConnectionIndex.size(); i++)
