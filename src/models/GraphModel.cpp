@@ -1,6 +1,6 @@
 #include "GraphModel.h"
 
-const int GROUP_SIZE = 20;
+const int GROUP_SIZE = 10;
 
 GraphModel::GraphModel()
 {
@@ -47,7 +47,7 @@ void GraphModel::PrepareNodes()
 	glEnableVertexAttribArray(colorLocation);
 	glEnableVertexAttribArray(sizeLocation);
 
-	glVertexAttribPointer(positionLocation, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)0);
+	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)0);
 	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)(offsetof(VertexData, VertexData::color)));
 	glVertexAttribPointer(sizeLocation, 1, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)(offsetof(VertexData, VertexData::size)));
 
@@ -78,18 +78,18 @@ void GraphModel::Update()
 	glUniform1iv(glGetUniformLocation(computeShader.GetShaderProgram(), "graphDataSize"), 1, &size);
 	glUniform1iv(glGetUniformLocation(computeShader.GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
 
-	glDispatchCompute((size / GROUP_SIZE) + 1, 1, 1);
+	glDispatchCompute( (size / GROUP_SIZE) +1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
-	//VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
+	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
 }
 
 void GraphModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
-	DrawEdges(projection_matrix, view_matrix, cameraPosition);
+	// DrawEdges(projection_matrix, view_matrix, cameraPosition);
 }
 
 void GraphModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)

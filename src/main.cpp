@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
     }
 
     std::sort(uniqueEdge.begin(), uniqueEdge.end());
-    uniqueEdge.erase(std::unique(uniqueEdge.begin(), uniqueEdge.end()));
+    auto it = std::unique(uniqueEdge.begin(), uniqueEdge.end());
+    uniqueEdge.resize(std::distance(uniqueEdge.begin(),it)); 
 
     map<string, int> edgeIndexMap;
     for (int i = 0; i < uniqueEdge.size(); i++)
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 
     Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
     Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
-    ComputeShader computeShader("res/shaders/fruchtermanreingold.comp");
+    ComputeShader computeShader("res/shaders/fruchtermanreingold1_1.comp");
 
     Camera *camera = new Camera(config);
     camera->SetCameraVelocity(glm::vec3(10.f));
@@ -125,7 +126,7 @@ int main(int argc, char *argv[])
 
     std::cout << connectionData.size() << endl;
 
-    app->SetNodesCount(uniqueEdge.size() + 1);
+    app->SetNodesCount(uniqueEdge.size());
 
 
     auto graph = new GraphModel(nodeShader, edgeShader, computeShader, &nodeData, &fromToConnectionIndex);
