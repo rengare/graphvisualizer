@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
 
     auto app = new App(config);
 
-    Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-    Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
-    ComputeShader computeShader("res/shaders/fruchtermanreingold1_1.comp");
+    // Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
+    // Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+    // ComputeShader computeShader("res/shaders/fruchtermanreingold1_1.comp");
 
     Camera *camera = new Camera(config);
     camera->SetCameraVelocity(glm::vec3(10.f));
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     app->SetNodesCount(uniqueEdge.size());
 
 
-    auto graph = new FRModel(nodeShader, edgeShader, computeShader, &nodeData, &fromToConnectionIndex);
+    auto graph = new FRModel(config, &nodeData, &fromToConnectionIndex);
     app->graphModel = *graph;
 
     //app->connections = &connections;

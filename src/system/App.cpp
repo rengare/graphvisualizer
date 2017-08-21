@@ -201,7 +201,7 @@ void App::Draw()
 
     graphModel.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
-    RenderGui();
+    // RenderGui();
     renderer->EndDraw();
 }
 

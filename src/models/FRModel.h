@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
 
+#include "../config/AppConfig.h"
 #include "../graphic/GraphicsStructure.h"
 #include "../graphic/Shader.h"
 #include "../graphic/ComputeShader.h"
@@ -20,7 +21,7 @@ class FRModel
   public:
     FRModel();
     ~FRModel();
-    FRModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
+    FRModel(AppConfig config, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
 
 	void PrepareNodes();
 
@@ -52,10 +53,15 @@ class FRModel
     GLuint nodeSsbo;
 	GLuint fromToSsbo;
 
-	Shader nodeShader, edgeShader;
-	ComputeShader computeShader;
+	Shader *nodeShader, *edgeShader;
+    
+    ComputeShader *repulsiveCompute;
+    ComputeShader *attractiveCompute;
+    ComputeShader *updateCompute;
+    
 
     int size;
-	int fromToConnectionSize;
+    int fromToConnectionSize;
+    AppConfig config;
 };
 #endif
