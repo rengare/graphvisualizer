@@ -2,12 +2,11 @@
 layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
 
 
-int currentEdgeIteration = 0;
-float SPEED_DIVISOR = 800;
-float AREA_MULTIPLICATOR = 1000;
-float speed = 10;
-float area = 10000;
-float gravity = 10;
+float SPEED_DIVISOR = 800.0;
+float AREA_MULTIPLICATOR = 1000.0;
+float speed = 10.0;
+float area = 1000000.0;
+float gravity = 10.0;
 
 struct GraphicData
 {
