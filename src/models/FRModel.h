@@ -14,13 +14,13 @@
 #include "../helper/RandomNumberGenerator.h"
 
 using namespace std;
-class GraphModel
+class FRModel
 {
 
   public:
-    GraphModel();
-    ~GraphModel();
-    GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
+    FRModel();
+    ~FRModel();
+    FRModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
 
 	void PrepareNodes();
 

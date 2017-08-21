@@ -22,8 +22,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
 
-#include "../models/InstancedModel.h"
-#include "../models/GraphModel.h"
+#include "../models/FRModel.h"
 
 using namespace std;
 
@@ -53,7 +52,7 @@ public:
 
   //InstancedModel nodes;
   //InstancedModel edges;
-  GraphModel graphModel;
+  FRModel graphModel;
 
 private:
   bool InitSdl();

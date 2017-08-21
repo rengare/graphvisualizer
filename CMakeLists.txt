@@ -37,8 +37,7 @@ set(SOURCE_FILES
         src/graphic/Shader.cpp src/graphic/Shader.h
         src/graphic/ComputeShader.cpp src/graphic/ComputeShader.h
         src/graphic/Renderer.cpp src/graphic/Renderer.h
-        src/models/InstancedModel.cpp src/models/InstancedModel.h
-        src/models/GraphModel.cpp src/models/GraphModel.h
+        src/models/FRModel.cpp src/models/FRModel.h
         src/graphic/camera/Camera.cpp src/graphic/camera/Camera.h
 
         src/system/App.cpp src/system/App.h

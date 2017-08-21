@@ -1,4 +1,3 @@
-#include "../models/InstancedModel.h"
 #include "App.h"
 
 App::App(AppConfig config)

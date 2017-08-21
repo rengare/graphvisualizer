@@ -9,7 +9,6 @@
 #include "system/App.h"
 #include "graphic/Shader.h"
 #include "graphic/ComputeShader.h"
-#include "models/InstancedModel.h"
 #include "graphic/GraphicsStructure.h"
 
 using json = nlohmann::json;
@@ -129,7 +128,7 @@ int main(int argc, char *argv[])
     app->SetNodesCount(uniqueEdge.size());
 
 
-    auto graph = new GraphModel(nodeShader, edgeShader, computeShader, &nodeData, &fromToConnectionIndex);
+    auto graph = new FRModel(nodeShader, edgeShader, computeShader, &nodeData, &fromToConnectionIndex);
     app->graphModel = *graph;
 
     //app->connections = &connections;

@@ -1,17 +1,17 @@
-#include "GraphModel.h"
+#include "FRModel.h"
 
 const int GROUP_SIZE = 10;
 
-GraphModel::GraphModel()
+FRModel::FRModel()
 {
 }
 
-GraphModel::~GraphModel()
+FRModel::~FRModel()
 {
 	glDeleteBuffers(1, &nodeSsbo);
 }
 
-GraphModel::GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections)
+FRModel::FRModel(Shader nodeShader, Shader edgeShader, ComputeShader computeShader, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections)
 {
 	this->nodeShader = nodeShader;
 	this->edgeShader = edgeShader;
@@ -27,7 +27,7 @@ GraphModel::GraphModel(Shader nodeShader, Shader edgeShader, ComputeShader compu
 	PrepareNodes();
 }
 
-void GraphModel::PrepareNodes() 
+void FRModel::PrepareNodes() 
 {
 	glGenVertexArrays(1, &nodeVao);
 	glBindVertexArray(nodeVao);
@@ -64,12 +64,12 @@ void GraphModel::PrepareNodes()
 
 }
 
-void GraphModel::PrepareEdges()
+void FRModel::PrepareEdges()
 {
 
 }
 
-void GraphModel::Update() 
+void FRModel::Update() 
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 	
@@ -86,13 +86,13 @@ void GraphModel::Update()
 	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
 }
 
-void GraphModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
 	// DrawEdges(projection_matrix, view_matrix, cameraPosition);
 }
 
-void GraphModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	glUseProgram(nodeShader.GetShaderProgram());
 
@@ -106,7 +106,7 @@ void GraphModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &
 	glBindVertexArray(0);
 }
 
-void GraphModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	glUseProgram(edgeShader.GetShaderProgram());
 
@@ -120,7 +120,7 @@ void GraphModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &
 	glBindVertexArray(0);
 }
 
-void GraphModel::Clear() 
+void FRModel::Clear() 
 {
 	glDeleteBuffers(1, &nodeSsbo);
 }
