@@ -4,8 +4,8 @@ layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
 
 float SPEED_DIVISOR = 800.0;
 float AREA_MULTIPLICATOR = 1000.0;
-float speed = 10.0;
-float area = 1000000.0;
+float speed = 100.0;
+float area = 100.0;
 float gravity = 10.0;
 
 struct GraphicData
@@ -37,7 +37,7 @@ layout (std430, binding = 8) buffer DataConnections
 layout( location = 1 ) uniform int graphDataSize;
 layout( location = 9 ) uniform int connectionSize;
 
-shared vec4 localPositions[ gl_WorkGroupSize.x ];
+// shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
 void syncronize()
 {
@@ -59,17 +59,17 @@ void main(void)
     data[globalIndex].dy = 0;
     data[globalIndex].dz = 0;
 
-    localPositions[localIndex] = data[globalIndex].position;
+    // localPositions[localIndex] = data[globalIndex].position;
 
     syncronize();
 
-    for (uint j = 0; j < gl_WorkGroupSize.x-1; j++)
+    for (uint j = 0; j < graphDataSize; j++)
     {
-        if (localIndex != j)
+        if (globalIndex != j)
         {
-            float xDist = localPositions[localIndex][0] - localPositions[j][0];
-            float yDist = localPositions[localIndex][1] - localPositions[j][1];
-            float zDist = localPositions[localIndex][2] - localPositions[j][2];
+            float xDist = data[globalIndex].position[0] - data[j].position[0];
+            float yDist = data[globalIndex].position[1] - data[j].position[1];
+            float zDist = data[globalIndex].position[2] - data[j].position[2];
             float dist = sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
             float repulsive = (k * k) / dist;
             data[globalIndex].dx += xDist / dist * repulsive;
