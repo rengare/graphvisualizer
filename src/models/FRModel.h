@@ -35,6 +35,9 @@ class FRModel
     
     void Update();
 
+    void UpdateNodes();
+    void UpdateEdges();
+
 	void Clear();
 	
     vector<VertexData> *GetVertexData();
@@ -43,6 +46,7 @@ class FRModel
 
   private:
 	vector<VertexData> *bufferVertices;
+	VertexData* edgeVertices;
 	vector<ConnectionIndices> *fromToConnections;
 
     GLenum drawingMode = GL_POINTS;
@@ -51,14 +55,17 @@ class FRModel
 
     GLuint nodeVao;
     GLuint nodeSsbo;
-	GLuint fromToSsbo;
+    GLuint fromToSsbo;
+    
+    GLuint edgeVao;
+    GLuint edgeSsbo;
 
 	Shader *nodeShader, *edgeShader;
     
     ComputeShader *repulsiveCompute;
     ComputeShader *attractiveCompute;
     ComputeShader *updateCompute;
-    
+    ComputeShader *linesCompute;
 
     int size;
     int fromToConnectionSize;

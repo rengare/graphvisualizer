@@ -2,7 +2,6 @@
 
 in vec4 in_position;
 in vec4 in_color;
-in float in_size;
 
 uniform mat4 projection_matrix, view_matrix;
 
@@ -13,13 +12,8 @@ void main()
 {
 
 	color = in_color;
-	vec3 pos = vec3(in_position);
-    vec4 modelViewPosition = view_matrix * vec4(pos, 1);
+    vec4 modelViewPosition = view_matrix * vec4(in_position.xyz, 1);
 	
-    // gl_PointSize = 10 * (500 / -modelViewPosition.z);
-	
-	// centerPosition = in_position;
-
 	gl_Position = projection_matrix * modelViewPosition;
 	
 }

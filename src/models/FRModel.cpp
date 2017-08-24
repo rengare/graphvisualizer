@@ -19,6 +19,7 @@ FRModel::FRModel(AppConfig config, vector<VertexData> *data, vector<ConnectionIn
 	this->repulsiveCompute = new ComputeShader("res/shaders/fruchtermanreingold_repulsive.comp");
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchtermanreingold_positionupdate.comp");
+	this->linesCompute = new ComputeShader("res/shaders/fruchtermanreingold_lines.comp");
 
 	this->bufferVertices = data;
 	this->fromToConnections = fromToConnections;
@@ -28,6 +29,7 @@ FRModel::FRModel(AppConfig config, vector<VertexData> *data, vector<ConnectionIn
 	fromToConnectionSize = (*fromToConnections).size();
 
 	PrepareNodes();
+	PrepareEdges();
 }
 
 void FRModel::PrepareNodes() 
@@ -69,10 +71,48 @@ void FRModel::PrepareNodes()
 
 void FRModel::PrepareEdges()
 {
+	edgeVertices = new VertexData[fromToConnectionSize];
 
+	glGenVertexArrays(1, &edgeVao);
+	glBindVertexArray(edgeVao);
+
+	glGenBuffers(1, &edgeSsbo);
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, edgeVao);
+	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(VertexData), &edgeVertices[0], GL_STATIC_DRAW);
+
+	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
+	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
+
+	glEnableVertexAttribArray(positionLocation);
+	glEnableVertexAttribArray(colorLocation);
+
+	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)0);
+	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)(offsetof(VertexData, VertexData::color)));
+
+	glBindVertexArray(positionLocation);
+	glBindVertexArray(colorLocation);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
+	glBufferData(GL_ARRAY_BUFFER, size * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
+	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
+
+
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
 }
 
 void FRModel::Update() 
+{
+	UpdateNodes();
+	UpdateEdges();
+}
+
+void FRModel::UpdateNodes() 
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 	
@@ -97,20 +137,36 @@ void FRModel::Update()
 	glDispatchCompute( (size / GROUP_SIZE) +1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+}
+
+void FRModel::UpdateEdges() 
+{
+
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
+
+	//lines
+	glUseProgram(linesCompute->GetShaderProgram());
+	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
+	glDispatchCompute( (fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
+	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
+	
+	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, fromToConnectionSize * sizeof(VertexData), bufMask);
 }
 
 void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
-	// DrawEdges(projection_matrix, view_matrix, cameraPosition);
+	DrawEdges(projection_matrix, view_matrix, cameraPosition);
 }
 
 void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
+
 	glUseProgram(nodeShader->GetShaderProgram());
 
 	glBindVertexArray(nodeVao);
@@ -125,14 +181,16 @@ void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 
 void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
+	
 	glUseProgram(edgeShader->GetShaderProgram());
 
-	glBindVertexArray(nodeVao);
+	glBindVertexArray(edgeVao);
 
 	glUniformMatrix4fv(glGetUniformLocation(edgeShader->GetShaderProgram(), "view_matrix"), 1, false, &view_matrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(edgeShader->GetShaderProgram(), "projection_matrix"), 1, false, &projection_matrix[0][0]);
 
-	glDrawArrays(GL_LINES, 0, size);
+	glDrawArrays(GL_LINES, 0, fromToConnectionSize);
 
 	glBindVertexArray(0);
 }
@@ -140,4 +198,5 @@ void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 void FRModel::Clear() 
 {
 	glDeleteBuffers(1, &nodeSsbo);
+	glDeleteBuffers(1, &edgeSsbo);
 }
