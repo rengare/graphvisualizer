@@ -13,6 +13,7 @@
     "skip": 2,
     "graphType3d": true,
     "showEdge": false,
+    "isUpdateOn": false,
     "nodeShaderName": "nodes",
     "lineShaderName": "lines",
     "nodeShaderVertexPath": "res/shaders/circle.vert",

@@ -74,7 +74,7 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
-	graphModel.Update();
+    graphModel.Update();
 
     camera->Update();
 }
@@ -166,7 +166,7 @@ void App::Update()
 //             #else
 //                 float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
 //             #endif
-                            
+
 //             pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
 //             pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
 //             if (config.graphType3d)
@@ -201,7 +201,7 @@ void App::Draw()
 
     graphModel.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
-    // RenderGui();
+    RenderGui();
     renderer->EndDraw();
 }
 
@@ -391,32 +391,7 @@ void App::RenderGui()
     }
     ImGui::End();
 
-    ImGui::Begin("Graph settings");
-    {
-        ImGui::Checkbox("Show edge", &config.showEdge);
-        if (ImGui::InputInt("Find node", &nodeIndex))
-        {
-            //if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
-            //{
-            //    auto pos = nodes.GetPosition(nodeIndex);
-
-            //    pos *= -0.5;
-            //    pos.z -= 50;
-
-            //    camera->cameraPosition = glm::vec3(pos.x, pos.y, pos.z);
-            //    camera->MakePosition();
-            //    camera->Forward();
-            //}
-        };
-
-        // ImGui::InputInt("SPEED_DIVISOR", &SPEED_DIVISOR);
-        // ImGui::InputInt("AREA_MULTIPLICATOR", &AREA_MULTIPLICATOR);
-        ImGui::InputFloat("speed", &speed);
-        ImGui::InputFloat("area", &area);
-        ImGui::InputFloat("gravity", &gravity);
-    }
-
-    ImGui::End();
+    graphModel.DrawGui();
 
     ImGui::Render();
 }

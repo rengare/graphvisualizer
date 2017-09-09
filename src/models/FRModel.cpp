@@ -34,7 +34,7 @@ FRModel::FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexDa
 	PrepareNodes();
 }
 
-void FRModel::PrepareNodes() 
+void FRModel::PrepareNodes()
 {
 	glGenVertexArrays(1, &nodeVao);
 	glBindVertexArray(nodeVao);
@@ -61,7 +61,7 @@ void FRModel::PrepareNodes()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
 
@@ -70,14 +70,13 @@ void FRModel::PrepareNodes()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
 }
 
 void FRModel::PrepareEdges()
 {
 	glGenVertexArrays(1, &edgeVao);
 	glBindVertexArray(edgeVao);
-	
+
 	glGenBuffers(1, &edgeSsbo);
 	glEnableVertexAttribArray(0);
 
@@ -95,77 +94,88 @@ void FRModel::PrepareEdges()
 
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
 
-
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
 }
 
-void FRModel::Update() 
+void FRModel::Update()
 {
-	UpdateNodes();
-	UpdateEdges();
+	if (config.isUpdateOn)
+	{
+		UpdateNodes();
+		UpdateEdges();
+	};
 }
 
-void FRModel::UpdateNodes() 
+void FRModel::UpdateNodes()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
-	
-//repulsive
+
+	//repulsive
 	glUseProgram(repulsiveCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(repulsiveCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
-	glUniform1iv(glGetUniformLocation(repulsiveCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (nodeSize / GROUP_SIZE) +1, 1, 1);
+	PassUniforms(repulsiveCompute->GetShaderProgram());
+	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-//attractive
+	//attractive
 	glUseProgram(attractiveCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(attractiveCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
-	glUniform1iv(glGetUniformLocation(attractiveCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (fromToConnectionSize / GROUP_SIZE) +1, 1, 1);
+	PassUniforms(attractiveCompute->GetShaderProgram());
+	glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-//update
+	//update
 	glUseProgram(updateCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(updateCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
-	glUniform1iv(glGetUniformLocation(updateCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (nodeSize / GROUP_SIZE) +1, 1, 1);
+	PassUniforms(updateCompute->GetShaderProgram());
+	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-	
+
 	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
 }
 
-void FRModel::UpdateEdges() 
+void FRModel::UpdateEdges()
 {
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
 
 	//lines
 	glUseProgram(linesCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
-	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
+	PassUniforms(linesCompute->GetShaderProgram());
+	glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-	
+}
+
+void FRModel::PassUniforms(GLuint shader)
+{
+	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
+	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
+
+	glUniform1fv(11, 1, &speed);
+	glUniform1fv(12, 1, &area);
+	glUniform1fv(13, 1, &gravity);
 }
 
 void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
-	DrawEdges(projection_matrix, view_matrix, cameraPosition);
+
+	if (config.showEdge)
+	{
+		DrawEdges(projection_matrix, view_matrix, cameraPosition);
+	};
 }
 
 void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
@@ -181,16 +191,15 @@ void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 
 	glDrawArrays(GL_POINTS, 0, nodeSize);
 
-	glUseProgram(0);	
+	glUseProgram(0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
 }
 
 void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
-	
+
 	glUseProgram(edgeShader->GetShaderProgram());
 
 	glBindVertexArray(edgeVao);
@@ -200,13 +209,57 @@ void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 
 	glDrawArrays(GL_LINES, 0, edgeSize);
 
-
-	glUseProgram(0);	
+	glUseProgram(0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void FRModel::Clear() 
+void FRModel::DrawGui()
+{
+	ImGui::Begin("Graph settings");
+	{
+		ImGui::Checkbox("Show edge", &config.showEdge);
+		ImGui::Checkbox("Update", &config.isUpdateOn);
+		// if (ImGui::InputInt("Find node", &nodeIndex))
+		// {
+		//     //if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
+		//     //{
+		//     //    auto pos = nodes.GetPosition(nodeIndex);
+
+		//     //    pos *= -0.5;
+		//     //    pos.z -= 50;
+
+		//     //    camera->cameraPosition = glm::vec3(pos.x, pos.y, pos.z);
+		//     //    camera->MakePosition();
+		//     //    camera->Forward();
+		//     //}
+		// };
+
+		if (ImGui::InputFloat("speed", &speed))
+		{
+			if (speed < 0.0)
+			{
+				speed = 0.1;
+			}
+			if (speed > 1000.0)
+			{
+				speed = 1000.0;
+			}
+		};
+
+		if (ImGui::InputFloat("area", &area))
+		{
+			if(area <= 0.0){
+				area = 0.1;
+			}
+		};
+		ImGui::InputFloat("gravity", &gravity);
+	}
+
+	ImGui::End();
+}
+
+void FRModel::Clear()
 {
 	glDeleteBuffers(1, &nodeSsbo);
 	glDeleteBuffers(1, &edgeSsbo);

@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
     config.skip = settingsJson["skip"].get<float>();
     config.graphType3d = settingsJson["graphType3d"].get<bool>();
     config.showEdge = settingsJson["showEdge"].get<bool>();
+    config.isUpdateOn = settingsJson["isUpdateOn"].get<bool>();
     config.nodeShaderName = settingsJson["nodeShaderName"].get<std::string>();
     config.lineShaderName = settingsJson["lineShaderName"].get<std::string>();
     config.nodeShaderVertexPath = settingsJson["nodeShaderVertexPath"].get<std::string>();

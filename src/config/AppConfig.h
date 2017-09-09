@@ -19,6 +19,7 @@ struct AppConfig
     float skip;
     bool graphType3d;
     bool showEdge = true;
+    bool isUpdateOn = true;
     std::string nodeShaderName = "";
     std::string lineShaderName = "";
     std::string nodeShaderVertexPath = "";
