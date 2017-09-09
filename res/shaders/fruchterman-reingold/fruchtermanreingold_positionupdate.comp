@@ -1,7 +1,6 @@
 #version 430
 layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
 
-
 float SPEED_DIVISOR = 800.0;
 float AREA_MULTIPLICATOR = 1000.0;
 float speed = 100.0;
@@ -37,7 +36,7 @@ layout (std430, binding = 8) buffer DataConnections
 layout( location = 1 ) uniform int graphDataSize;
 layout( location = 9 ) uniform int connectionSize;
 
-// shared vec4 localPositions[ gl_WorkGroupSize.x ];
+shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
 void syncronize()
 {
@@ -55,26 +54,27 @@ void main(void)
     
     if(globalIndex > graphDataSize) return;
 
-    data[globalIndex].dx = 0;
-    data[globalIndex].dy = 0;
-    data[globalIndex].dz = 0;
+    GraphicData pos = data[globalIndex];
+    float d = sqrt((pos.position[0] * pos.position[0] + pos.position[1] * pos.position[1] + pos.position[2] * pos.position[2]));
+    float gf = 0.01 * k * gravity * d;
 
-    // localPositions[localIndex] = data[globalIndex].position;
+    pos.dx -= gf * pos.position[0] / d;
+    pos.dy -= gf * pos.position[1] / d;
+    pos.dz -= gf * pos.position[2] / d;
 
-    syncronize();
+    pos.dx += speed;
+    pos.dy += speed;
+    pos.dz += speed;
 
-    for (uint j = 0; j < graphDataSize; j++)
+    d = sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
+
+    if (d > 0)
     {
-        if (globalIndex != j)
-        {
-            float xDist = data[globalIndex].position[0] - data[j].position[0];
-            float yDist = data[globalIndex].position[1] - data[j].position[1];
-            float zDist = data[globalIndex].position[2] - data[j].position[2];
-            float dist = sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-            float repulsive = (k * k) / dist;
-            data[globalIndex].dx += xDist / dist * repulsive;
-            data[globalIndex].dy += yDist / dist * repulsive;
-            data[globalIndex].dz += zDist / dist * repulsive;
-        }
+        float limitedDist = min(maxDisplace * (speed / SPEED_DIVISOR), d);
+                        
+        pos.position[0] = pos.position[0] + pos.dx / d * limitedDist;
+        pos.position[1] = pos.position[1] + pos.dy / d * limitedDist;
+        pos.position[2] = pos.position[2] + pos.dz / d * limitedDist;
     }
+    data[globalIndex] = pos;
 }

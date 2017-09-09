@@ -10,10 +10,8 @@ out vec3 centerPosition;
 
 void main()
 {
-
 	color = in_color;
     vec4 modelViewPosition = view_matrix * vec4(in_position.xyz, 1);
 	
 	gl_Position = projection_matrix * modelViewPosition;
-	
 }

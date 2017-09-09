@@ -21,7 +21,7 @@ class FRModel
   public:
     FRModel();
     ~FRModel();
-    FRModel(AppConfig config, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections);
+    FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
 	void PrepareNodes();
 
@@ -46,7 +46,7 @@ class FRModel
 
   private:
 	vector<VertexData> *bufferVertices;
-	VertexData* edgeVertices;
+	vector<VertexData> *edgeVertices;
 	vector<ConnectionIndices> *fromToConnections;
 
     GLenum drawingMode = GL_POINTS;
@@ -67,7 +67,8 @@ class FRModel
     ComputeShader *updateCompute;
     ComputeShader *linesCompute;
 
-    int size;
+    int nodeSize;
+    int edgeSize;
     int fromToConnectionSize;
     AppConfig config;
 };

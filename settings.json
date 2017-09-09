@@ -13,10 +13,10 @@
     "skip": 2,
     "graphType3d": true,
     "showEdge": false,
-    "nodeManagerName": "nodes",
+    "nodeShaderName": "nodes",
+    "lineShaderName": "lines",
     "nodeShaderVertexPath": "res/shaders/circle.vert",
     "nodeShaderFragmentPath": "res/shaders/circle.frag",
-    "lineManagerName": "lines",
     "lineShaderVertexPath": "res/shaders/line.vert",
     "lineShaderFragmentPath": "res/shaders/line.frag",
     "edgeInput": "array.edges"

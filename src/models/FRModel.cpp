@@ -11,25 +11,27 @@ FRModel::~FRModel()
 	glDeleteBuffers(1, &nodeSsbo);
 }
 
-FRModel::FRModel(AppConfig config, vector<VertexData> *data, vector<ConnectionIndices> *fromToConnections)
+FRModel::FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
 {
-	this->nodeShader = new Shader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-	this->edgeShader = new Shader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+	this->nodeShader = new Shader(config.nodeShaderName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
+	this->edgeShader = new Shader(config.lineShaderName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
 
-	this->repulsiveCompute = new ComputeShader("res/shaders/fruchtermanreingold_repulsive.comp");
-	this->attractiveCompute = new ComputeShader("res/shaders/fruchtermanreingold_attractive.comp");
-	this->updateCompute = new ComputeShader("res/shaders/fruchtermanreingold_positionupdate.comp");
-	this->linesCompute = new ComputeShader("res/shaders/fruchtermanreingold_lines.comp");
+	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
+	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
+	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
+	this->linesCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_lines.comp");
 
-	this->bufferVertices = data;
+	this->bufferVertices = nodeData;
+	this->edgeVertices = edgeData;
 	this->fromToConnections = fromToConnections;
 	this->config = config;
 
-	size = (*bufferVertices).size();
+	nodeSize = (*bufferVertices).size();
+	edgeSize = (*edgeVertices).size();
 	fromToConnectionSize = (*fromToConnections).size();
 
-	PrepareNodes();
 	PrepareEdges();
+	PrepareNodes();
 }
 
 void FRModel::PrepareNodes() 
@@ -42,7 +44,7 @@ void FRModel::PrepareNodes()
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 
 	int positionLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_color");
@@ -63,24 +65,24 @@ void FRModel::PrepareNodes()
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
 
-
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 }
 
 void FRModel::PrepareEdges()
 {
-	edgeVertices = new VertexData[fromToConnectionSize];
-
 	glGenVertexArrays(1, &edgeVao);
 	glBindVertexArray(edgeVao);
-
+	
 	glGenBuffers(1, &edgeSsbo);
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, edgeVao);
-	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(VertexData), &edgeVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
 
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
@@ -95,7 +97,7 @@ void FRModel::PrepareEdges()
 	glBindVertexArray(colorLocation);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, size * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
@@ -118,26 +120,29 @@ void FRModel::UpdateNodes()
 	
 //repulsive
 	glUseProgram(repulsiveCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(repulsiveCompute->GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(repulsiveCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(repulsiveCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (size / GROUP_SIZE) +1, 1, 1);
+	glDispatchCompute( (nodeSize / GROUP_SIZE) +1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 //attractive
 	glUseProgram(attractiveCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(attractiveCompute->GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(attractiveCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(attractiveCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
 	glDispatchCompute( (fromToConnectionSize / GROUP_SIZE) +1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 //update
 	glUseProgram(updateCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(updateCompute->GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(updateCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(updateCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
-	glDispatchCompute( (size / GROUP_SIZE) +1, 1, 1);
+	glDispatchCompute( (nodeSize / GROUP_SIZE) +1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	
+	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
 }
 
 void FRModel::UpdateEdges() 
@@ -147,14 +152,14 @@ void FRModel::UpdateEdges()
 
 	//lines
 	glUseProgram(linesCompute->GetShaderProgram());
-	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "graphDataSize"), 1, &size);
+	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(linesCompute->GetShaderProgram(), "connectionSize"), 1, &fromToConnectionSize);
 	glDispatchCompute( (fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	
-	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, fromToConnectionSize * sizeof(VertexData), bufMask);
 }
 
 void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
@@ -165,7 +170,7 @@ void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_mat
 
 void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 
 	glUseProgram(nodeShader->GetShaderProgram());
 
@@ -174,14 +179,17 @@ void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 	glUniformMatrix4fv(glGetUniformLocation(nodeShader->GetShaderProgram(), "view_matrix"), 1, false, &view_matrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(nodeShader->GetShaderProgram(), "projection_matrix"), 1, false, &projection_matrix[0][0]);
 
-	glDrawArrays(GL_POINTS, 0, size);
+	glDrawArrays(GL_POINTS, 0, nodeSize);
 
+	glUseProgram(0);	
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 }
 
 void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
 	
 	glUseProgram(edgeShader->GetShaderProgram());
 
@@ -190,9 +198,12 @@ void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 	glUniformMatrix4fv(glGetUniformLocation(edgeShader->GetShaderProgram(), "view_matrix"), 1, false, &view_matrix[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(edgeShader->GetShaderProgram(), "projection_matrix"), 1, false, &projection_matrix[0][0]);
 
-	glDrawArrays(GL_LINES, 0, fromToConnectionSize);
+	glDrawArrays(GL_LINES, 0, edgeSize);
 
+
+	glUseProgram(0);	
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void FRModel::Clear() 

@@ -7,9 +7,9 @@
 using namespace glm;
 struct VertexData
 {
-	vec4 vertexPosition;
-	vec4 color;
-	float size;
+	vec4 vertexPosition = vec4(0,0,0,0);
+	vec4 color = vec4(0,0,0,1);
+	float size = 0;
 	float dx = 0, dy = 0, dz = 0;
 
 	VertexData(){};

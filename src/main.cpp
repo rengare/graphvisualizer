@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
     config.skip = settingsJson["skip"].get<float>();
     config.graphType3d = settingsJson["graphType3d"].get<bool>();
     config.showEdge = settingsJson["showEdge"].get<bool>();
-    config.nodeManagerName = settingsJson["nodeManagerName"].get<std::string>();
+    config.nodeShaderName = settingsJson["nodeShaderName"].get<std::string>();
+    config.lineShaderName = settingsJson["lineShaderName"].get<std::string>();
     config.nodeShaderVertexPath = settingsJson["nodeShaderVertexPath"].get<std::string>();
     config.nodeShaderFragmentPath = settingsJson["nodeShaderFragmentPath"].get<std::string>();
-    config.lineManagerName = settingsJson["lineManagerName"].get<std::string>();
     config.lineShaderVertexPath = settingsJson["lineShaderVertexPath"].get<std::string>();
     config.lineShaderFragmentPath = settingsJson["lineShaderFragmentPath"].get<std::string>();
     config.edgeInput = settingsJson["edgeInput"].get<std::string>();
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     camera->SetPosition(glm::vec3(0, 0, -700));
     app->AddCamera(camera);
 
-    vector<VertexData> connectionData;
+    vector<VertexData> edgeData;
     vector<VertexData> nodeData(uniqueEdge.size());
 
     int hostArrayIndex = 0;
@@ -117,18 +117,19 @@ int main(int argc, char *argv[])
         hostArrayIndex += 7;
     }
 
+
     for (int i = 0; i < fromToConnectionIndex.size(); i++)
     {
-        connectionData.push_back(nodeData[fromToConnectionIndex[i].from]);
-        connectionData.push_back(nodeData[fromToConnectionIndex[i].to]);
+        edgeData.push_back(nodeData[fromToConnectionIndex[i].from]);
+        edgeData.push_back(nodeData[fromToConnectionIndex[i].to]);
     }
 
-    std::cout << connectionData.size() << endl;
+    std::cout << edgeData.size() << endl;
 
     app->SetNodesCount(uniqueEdge.size());
 
 
-    auto graph = new FRModel(config, &nodeData, &fromToConnectionIndex);
+    auto graph = new FRModel(config, &nodeData, &edgeData, &fromToConnectionIndex);
     app->graphModel = *graph;
 
     //app->connections = &connections;

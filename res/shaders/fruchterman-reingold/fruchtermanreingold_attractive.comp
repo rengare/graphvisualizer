@@ -1,7 +1,6 @@
 #version 430
 layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
 
-
 float SPEED_DIVISOR = 800.0;
 float AREA_MULTIPLICATOR = 1000.0;
 float speed = 100.0;
