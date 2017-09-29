@@ -15,3 +15,5 @@ sdl2/
 sdl2win32
 graphvisualizer.dir
 Win32/
+
+external/
