@@ -1,5 +1,7 @@
 #include "App.h"
 
+static int algorithmIndex = 0;
+
 App::App(AppConfig config)
 {
     this->config = config;
@@ -390,6 +392,14 @@ void App::RenderGui()
         ImGui::SliderFloat("blue", &config.blue, 0.0f, 255.0f);
     }
     ImGui::End();
+
+    ImGui::Begin("Algorithms");
+    {
+        ImGui::RadioButton("F-R gpu", &algorithmIndex, 0);
+        ImGui::RadioButton("F-R cpu", &algorithmIndex, 1);
+    }
+
+    ImGui::End();    
 
     graphModel.DrawGui();
 

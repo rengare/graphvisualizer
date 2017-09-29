@@ -90,7 +90,6 @@ private:
   float speed = 1;
   float area = 1000;
   float gravity = 10;
-
 };
 
 #endif
