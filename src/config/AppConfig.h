@@ -19,10 +19,11 @@ struct AppConfig
     float skip;
     bool graphType3d;
     bool showEdge = true;
-    std::string nodeManagerName = "";
+    bool isUpdateOn = true;
+    std::string nodeShaderName = "";
+    std::string lineShaderName = "";
     std::string nodeShaderVertexPath = "";
     std::string nodeShaderFragmentPath = "";
-    std::string lineManagerName = "";
     std::string lineShaderVertexPath = "";
     std::string lineShaderFragmentPath = "";
     std::string edgeInput;

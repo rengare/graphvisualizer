@@ -87,7 +87,7 @@ bool ComputeShader::Link()
 	return isLinked;
 }
 
-GLuint ComputeShader::GetShader()
+GLuint ComputeShader::GetShaderProgram()
 {
     return shaderProgram;
 }

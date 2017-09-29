@@ -1,5 +1,6 @@
-#include "../models/InstancedModel.h"
 #include "App.h"
+
+static int algorithmIndex = 0;
 
 App::App(AppConfig config)
 {
@@ -74,6 +75,8 @@ void App::Update()
 {
     ProcessInput();
     // Fruchterman_Reingold();
+
+    graphModel.Update();
 
     camera->Update();
 }
@@ -165,7 +168,7 @@ void App::Update()
 //             #else
 //                 float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
 //             #endif
-                            
+
 //             pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
 //             pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
 //             if (config.graphType3d)
@@ -390,32 +393,15 @@ void App::RenderGui()
     }
     ImGui::End();
 
-    ImGui::Begin("Graph settings");
+    ImGui::Begin("Algorithms");
     {
-        ImGui::Checkbox("Show edge", &config.showEdge);
-        if (ImGui::InputInt("Find node", &nodeIndex))
-        {
-            if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
-            {
-                auto pos = nodes.GetPosition(nodeIndex);
-
-                pos *= -0.5;
-                pos.z -= 50;
-
-                camera->cameraPosition = pos;
-                camera->MakePosition();
-                camera->Forward();
-            }
-        };
-
-        // ImGui::InputInt("SPEED_DIVISOR", &SPEED_DIVISOR);
-        // ImGui::InputInt("AREA_MULTIPLICATOR", &AREA_MULTIPLICATOR);
-        ImGui::InputFloat("speed", &speed);
-        ImGui::InputFloat("area", &area);
-        ImGui::InputFloat("gravity", &gravity);
+        ImGui::RadioButton("F-R gpu", &algorithmIndex, 0);
+        ImGui::RadioButton("F-R cpu", &algorithmIndex, 1);
     }
 
-    ImGui::End();
+    ImGui::End();    
+
+    graphModel.DrawGui();
 
     ImGui::Render();
 }

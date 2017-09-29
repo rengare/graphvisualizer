@@ -22,8 +22,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
 
-#include "../models/InstancedModel.h"
-#include "../models/GraphModel.h"
+#include "../models/FRModel.h"
 
 using namespace std;
 
@@ -51,9 +50,9 @@ public:
   std::vector<Connections> *connections;
   std::vector<ConnectionIndices> fromToConnectionIndex;
 
-  InstancedModel nodes;
-  InstancedModel edges;
-  GraphModel graphModel;
+  //InstancedModel nodes;
+  //InstancedModel edges;
+  FRModel graphModel;
 
 private:
   bool InitSdl();
@@ -91,7 +90,6 @@ private:
   float speed = 1;
   float area = 1000;
   float gravity = 10;
-
 };
 
 #endif

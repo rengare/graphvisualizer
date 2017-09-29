@@ -9,7 +9,6 @@
 #include "system/App.h"
 #include "graphic/Shader.h"
 #include "graphic/ComputeShader.h"
-#include "models/InstancedModel.h"
 #include "graphic/GraphicsStructure.h"
 
 using json = nlohmann::json;
@@ -35,10 +34,11 @@ int main(int argc, char *argv[])
     config.skip = settingsJson["skip"].get<float>();
     config.graphType3d = settingsJson["graphType3d"].get<bool>();
     config.showEdge = settingsJson["showEdge"].get<bool>();
-    config.nodeManagerName = settingsJson["nodeManagerName"].get<std::string>();
+    config.isUpdateOn = settingsJson["isUpdateOn"].get<bool>();
+    config.nodeShaderName = settingsJson["nodeShaderName"].get<std::string>();
+    config.lineShaderName = settingsJson["lineShaderName"].get<std::string>();
     config.nodeShaderVertexPath = settingsJson["nodeShaderVertexPath"].get<std::string>();
     config.nodeShaderFragmentPath = settingsJson["nodeShaderFragmentPath"].get<std::string>();
-    config.lineManagerName = settingsJson["lineManagerName"].get<std::string>();
     config.lineShaderVertexPath = settingsJson["lineShaderVertexPath"].get<std::string>();
     config.lineShaderFragmentPath = settingsJson["lineShaderFragmentPath"].get<std::string>();
     config.edgeInput = settingsJson["edgeInput"].get<std::string>();
@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
     }
 
     std::sort(uniqueEdge.begin(), uniqueEdge.end());
-    uniqueEdge.erase(std::unique(uniqueEdge.begin(), uniqueEdge.end()));
+    auto it = std::unique(uniqueEdge.begin(), uniqueEdge.end());
+    uniqueEdge.resize(std::distance(uniqueEdge.begin(),it)); 
 
     map<string, int> edgeIndexMap;
     for (int i = 0; i < uniqueEdge.size(); i++)
@@ -70,35 +71,28 @@ int main(int argc, char *argv[])
         edgeIndexMap[uniqueEdge[i]] = i;
     }
 
-    ConnectionIndices fromTo;
 
     std::vector<ConnectionIndices> fromToConnectionIndex;
     for (int i = 0; i < connections.size(); i++)
     {
+		ConnectionIndices fromTo;
         fromTo.from = edgeIndexMap[connections[i].from];
         fromTo.to = edgeIndexMap[connections[i].to];
-        fromToConnectionIndex.push_back(fromTo);
+		fromToConnectionIndex.push_back(fromTo);
     }
 
     auto app = new App(config);
 
-    Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-    Shader lineShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
-    ComputeShader computeShader("res/shaders/fruchtermanreingold.comp");
-
-    auto nodes = new InstancedModel(nodeShader.GetShaderProgram());
-    nodes->AddComputeShader(computeShader.GetShader());
-    auto lines = new InstancedModel(lineShader.GetShaderProgram());
-
-    lines->isVisible = config.showEdge;
-    lines->SetDrawingMode(GL_LINES);
+    // Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
+    // Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+    // ComputeShader computeShader("res/shaders/fruchtermanreingold1_1.comp");
 
     Camera *camera = new Camera(config);
     camera->SetCameraVelocity(glm::vec3(10.f));
     camera->SetPosition(glm::vec3(0, 0, -700));
     app->AddCamera(camera);
 
-    vector<VertexData> connectionData;
+    vector<VertexData> edgeData;
     vector<VertexData> nodeData(uniqueEdge.size());
 
     int hostArrayIndex = 0;
@@ -106,11 +100,11 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
-        nodeData[i].vertexPosition.x = RandomNumberGenerator(0, 10) / 10.f;
-        nodeData[i].vertexPosition.y = RandomNumberGenerator(0, 10) / 10.f;
+        nodeData[i].vertexPosition.x = RandomNumberGenerator(-100, 100) / 1.0;
+        nodeData[i].vertexPosition.y = RandomNumberGenerator(-100, 100) / 1.0;
         if (config.graphType3d)
         {
-            nodeData[i].vertexPosition.z = RandomNumberGenerator(0, 10) / 10.f;
+            nodeData[i].vertexPosition.z = RandomNumberGenerator(-100, 100) / 1.0;
         }
         else
         {
@@ -124,25 +118,23 @@ int main(int argc, char *argv[])
         hostArrayIndex += 7;
     }
 
+
     for (int i = 0; i < fromToConnectionIndex.size(); i++)
     {
-        connectionData.push_back(nodeData[fromToConnectionIndex[i].from]);
-        connectionData.push_back(nodeData[fromToConnectionIndex[i].to]);
+        edgeData.push_back(nodeData[fromToConnectionIndex[i].from]);
+        edgeData.push_back(nodeData[fromToConnectionIndex[i].to]);
     }
 
-    std::cout << connectionData.size() << endl;
+    std::cout << edgeData.size() << endl;
 
-    app->SetNodesCount(uniqueEdge.size() + 1);
-    nodes->AddInstanced(&nodeData);
-    lines->AddInstanced(&connectionData);
+    app->SetNodesCount(uniqueEdge.size());
 
-    app->nodes = *nodes;
-    app->edges = *lines;
-    auto graph = new GraphModel(nodeShader.GetShaderProgram(), computeShader.GetShader(), &nodeData);
+
+    auto graph = new FRModel(config, &nodeData, &edgeData, &fromToConnectionIndex);
     app->graphModel = *graph;
 
-    app->connections = &connections;
-    app->fromToConnectionIndex = fromToConnectionIndex;
+    //app->connections = &connections;
+    //app->fromToConnectionIndex = fromToConnectionIndex;
 
     app->SetAppState(AppState::RUN);
     app->Run();
