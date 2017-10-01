@@ -76,121 +76,10 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
-    graphModel.Update();
+    graphModel->Update();
 
     camera->Update();
 }
-
-// void App::Fruchterman_Reingold()
-// {
-//     auto nodesData = nodes.GetVertexData();
-//     auto nodeSize = nodesData->size();
-
-//     auto edgesData = edges.GetVertexData();
-//     (*edgesData).clear();
-
-//     float maxDisplace = (float)(std::sqrt(AREA_MULTIPLICATOR * area) / 10.f); // Déplacement limite : on peut le calibrer...
-//     float k = (float)std::sqrt((AREA_MULTIPLICATOR * area) / (1.f + nodeSize));
-
-//     for (int i = 0; i < nodeSize; i++)
-//     {
-//         (*nodesData)[i].dx = 0;
-//         (*nodesData)[i].dy = 0;
-//         (*nodesData)[i].dz = 0;
-
-//         for (int j = 0; j < nodeSize; j++)
-//         {
-//             if (i != j)
-//             {
-//                 float xDist = (*nodesData)[i].vertexPosition.x - (*nodesData)[j].vertexPosition.x;
-//                 float yDist = (*nodesData)[i].vertexPosition.y - (*nodesData)[j].vertexPosition.y;
-//                 float zDist = (*nodesData)[i].vertexPosition.z - (*nodesData)[j].vertexPosition.z;
-//                 float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-//                 if (dist > 0)
-//                 {
-//                     float repulsive = (k * k) / dist;
-//                     (*nodesData)[i].dx += xDist / dist * repulsive;
-//                     (*nodesData)[i].dy += yDist / dist * repulsive;
-//                     (*nodesData)[i].dz += zDist / dist * repulsive;
-//                 }
-//             }
-//         }
-//     }
-
-//     auto edgeSize = fromToConnectionIndex.size();
-//     for (int i = 0; i < edgeSize; i++)
-//     {
-//         auto source = (*nodesData)[fromToConnectionIndex[i].from];
-//         auto target = (*nodesData)[fromToConnectionIndex[i].to];
-
-//         float xDist = source.vertexPosition.x - target.vertexPosition.x;
-//         float yDist = source.vertexPosition.y - target.vertexPosition.y;
-//         float zDist = source.vertexPosition.z - target.vertexPosition.z;
-//         float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-
-//         if (dist > 0)
-//         {
-//             float atractive = (dist * dist) / k;
-//             source.dx -= xDist / dist * atractive;
-//             source.dy -= yDist / dist * atractive;
-//             source.dz -= zDist / dist * atractive;
-
-//             target.dx += xDist / dist * atractive;
-//             target.dy += yDist / dist * atractive;
-//             target.dz += zDist / dist * atractive;
-
-//             (*nodesData)[fromToConnectionIndex[i].from] = source;
-//             (*nodesData)[fromToConnectionIndex[i].to] = target;
-//         }
-//     }
-
-//     for (int i = 0; i < nodeSize; i++)
-//     {
-//         auto pos = (*nodesData)[i];
-//         float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
-//         float gf = 0.01f * k * (float)gravity * d;
-
-//         pos.dx -= gf * pos.vertexPosition.x / d;
-//         pos.dy -= gf * pos.vertexPosition.y / d;
-//         pos.dz -= gf * pos.vertexPosition.z / d;
-
-//         pos.dx += speed;
-//         pos.dy += speed;
-//         pos.dz += speed;
-
-//         d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
-
-//         if (d > 0)
-//         {
-
-//             #ifdef _WIN32
-//                 float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-//             #else
-//                 float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
-//             #endif
-
-//             pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
-//             pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
-//             if (config.graphType3d)
-//             {
-//                 pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
-//             }
-//         }
-//         (*nodesData)[i] = pos;
-//     }
-
-//     // edgeSize = (*connections).size();
-//     for (int i = 0; i < fromToConnectionIndex.size(); i++)
-//     {
-//         auto source = (*nodesData)[fromToConnectionIndex[i].from];
-//         auto target = (*nodesData)[fromToConnectionIndex[i].to];
-
-//         (*edgesData).push_back(source);
-//         (*edgesData).push_back(target);
-//     }
-//     nodes.AddInstanced(nodesData);
-//     edges.AddInstanced(edgesData);
-// }
 
 void App::Draw()
 {
@@ -201,7 +90,7 @@ void App::Draw()
     // nodes.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
     // edges.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
-    graphModel.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
+    graphModel->Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
     RenderGui();
     renderer->EndDraw();
@@ -363,45 +252,51 @@ void App::RenderGui()
 {
     ImGui_ImplSdlGL3_NewFrame(renderer->GetWindow());
 
-    string nodesText = "nodes count: " + to_string(nodeCount);
-    ImGui::Text(nodesText.c_str());
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
-                ImGui::GetIO().Framerate);
-
-    ImGui::Begin("Camera settings");
+    if (config.showGui)
     {
-        ImGui::Text("Camera position");
-        if (ImGui::InputFloat("Camera position x", &camera->cameraPosition.x, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera position y", &camera->cameraPosition.y, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera position z", &camera->cameraPosition.z, 0.0f, 1000000.0f))
-        {
-            camera->MakePosition();
-        }
 
-        ImGui::Text("Camera rotation");
-        if (ImGui::InputFloat("Camera rotation x", &camera->cameraRotation.x, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera rotation y", &camera->cameraRotation.y, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera rotation 5z", &camera->cameraRotation.z, 0.0f, 1000000.0f))
-        {
-            camera->MakeRotation();
-            camera->Back();
-        }
-    }
-    ImGui::End();
+        string nodesText = "nodes count: " + to_string(nodeCount);
+        ImGui::Text(nodesText.c_str());
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                    ImGui::GetIO().Framerate);
 
-    ImGui::Begin("System settings");
-    {
-        ImGui::SliderFloat("red", &config.red, 0.0f, 255.0f);
-        ImGui::SliderFloat("green", &config.green, 0.0f, 255.0f);
-        ImGui::SliderFloat("blue", &config.blue, 0.0f, 255.0f);
+        ImGui::Begin("Camera settings");
+        {
+            ImGui::Text("Camera position");
+            if (ImGui::InputFloat("Camera position x", &camera->cameraPosition.x, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera position y", &camera->cameraPosition.y, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera position z", &camera->cameraPosition.z, 0.0f, 1000000.0f))
+            {
+                camera->MakePosition();
+            }
+
+            ImGui::Text("Camera rotation");
+            if (ImGui::InputFloat("Camera rotation x", &camera->cameraRotation.x, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera rotation y", &camera->cameraRotation.y, 0.0f, 1000000.0f) || ImGui::InputFloat("Camera rotation 5z", &camera->cameraRotation.z, 0.0f, 1000000.0f))
+            {
+                camera->MakeRotation();
+                camera->Back();
+            }
+        }
+        ImGui::End();
+
+        ImGui::Begin("System settings");
+        {
+            ImGui::SliderFloat("red", &config.red, 0.0f, 255.0f);
+            ImGui::SliderFloat("green", &config.green, 0.0f, 255.0f);
+            ImGui::SliderFloat("blue", &config.blue, 0.0f, 255.0f);
+        }
+        ImGui::End();
     }
-    ImGui::End();
 
     ImGui::Begin("Algorithms");
     {
         ImGui::RadioButton("F-R gpu", &algorithmIndex, 0);
+        ImGui::SameLine();
         ImGui::RadioButton("F-R cpu", &algorithmIndex, 1);
+        ImGui::SameLine();
     }
 
-    ImGui::End();    
+    ImGui::End();
 
-    graphModel.DrawGui();
+    graphModel->DrawGui();
 
     ImGui::Render();
 }

@@ -33,17 +33,24 @@ set(SOURCE_FILES
         src/config/AppConfig.h
         src/helper/FileHelper.h
         src/helper/Logger.h
+        
+        src/graphic/camera/Camera.cpp src/graphic/camera/Camera.h
+        src/system/App.cpp src/system/App.h
 
         src/graphic/Shader.cpp src/graphic/Shader.h
         src/graphic/ComputeShader.cpp src/graphic/ComputeShader.h
         src/graphic/Renderer.cpp src/graphic/Renderer.h
-        src/models/FRModel.cpp src/models/FRModel.h
-        src/graphic/camera/Camera.cpp src/graphic/camera/Camera.h
+        
+        src/models/IModel.h
+        
+        src/models/FR/FRModel.h
+        src/models/FR/FRModel.cpp 
 
-        src/system/App.cpp src/system/App.h
+        src/models/FR/FRModelCpu.h
+        src/models/FR/FRModelCpu.cpp 
+
         src/main.cpp
         # src/test.cpp
-
         )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

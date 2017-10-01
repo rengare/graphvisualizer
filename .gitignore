@@ -17,3 +17,4 @@ graphvisualizer.dir
 Win32/
 
 external/
+cmake-build-debug/

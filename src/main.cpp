@@ -1,15 +1,12 @@
 #include <vector>
 #include <algorithm>
 #include <json.hpp>
-#include <istream>
-#include <map>
 
 #include "helper/RandomNumberGenerator.h"
 #include "config/AppConfig.h"
 #include "system/App.h"
 #include "graphic/Shader.h"
-#include "graphic/ComputeShader.h"
-#include "graphic/GraphicsStructure.h"
+#include "models/FR/FRModel.h"
 
 using json = nlohmann::json;
 
@@ -20,6 +17,7 @@ int main(int argc, char *argv[])
     settingsFile >> settingsJson;
 
     AppConfig config;
+    config.showGui = settingsJson["showGui"].get<bool>();
     config.width = settingsJson["width"].get<int>();
     config.height = settingsJson["height"].get<int>();
     config.positionX = settingsJson["positionX"].get<int>();
@@ -63,7 +61,7 @@ int main(int argc, char *argv[])
 
     std::sort(uniqueEdge.begin(), uniqueEdge.end());
     auto it = std::unique(uniqueEdge.begin(), uniqueEdge.end());
-    uniqueEdge.resize(std::distance(uniqueEdge.begin(),it)); 
+    uniqueEdge.resize((unsigned long) std::distance(uniqueEdge.begin(), it));
 
     map<string, int> edgeIndexMap;
     for (int i = 0; i < uniqueEdge.size(); i++)
@@ -82,11 +80,6 @@ int main(int argc, char *argv[])
     }
 
     auto app = new App(config);
-
-    // Shader nodeShader(config.nodeManagerName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-    // Shader edgeShader(config.lineManagerName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
-    // ComputeShader computeShader("res/shaders/fruchtermanreingold1_1.comp");
-
     Camera *camera = new Camera(config);
     camera->SetCameraVelocity(glm::vec3(10.f));
     camera->SetPosition(glm::vec3(0, 0, -700));
@@ -96,15 +89,15 @@ int main(int argc, char *argv[])
     vector<VertexData> nodeData(uniqueEdge.size());
 
     int hostArrayIndex = 0;
-    int range = config.range;
+    int range = (int) config.range;
 
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
-        nodeData[i].vertexPosition.x = RandomNumberGenerator(-100, 100) / 1.0;
-        nodeData[i].vertexPosition.y = RandomNumberGenerator(-100, 100) / 1.0;
+        nodeData[i].vertexPosition.x = RandomNumberGenerator(-100, 100) / 1.0f;
+        nodeData[i].vertexPosition.y = RandomNumberGenerator(-100, 100) / 1.0f;
         if (config.graphType3d)
         {
-            nodeData[i].vertexPosition.z = RandomNumberGenerator(-100, 100) / 1.0;
+            nodeData[i].vertexPosition.z = RandomNumberGenerator(-100, 100) / 1.0f;
         }
         else
         {
@@ -118,7 +111,6 @@ int main(int argc, char *argv[])
         hostArrayIndex += 7;
     }
 
-
     for (int i = 0; i < fromToConnectionIndex.size(); i++)
     {
         edgeData.push_back(nodeData[fromToConnectionIndex[i].from]);
@@ -127,14 +119,9 @@ int main(int argc, char *argv[])
 
     std::cout << edgeData.size() << endl;
 
-    app->SetNodesCount(uniqueEdge.size());
+    app->SetNodesCount((int) uniqueEdge.size());
 
-
-    auto graph = new FRModel(config, &nodeData, &edgeData, &fromToConnectionIndex);
-    app->graphModel = *graph;
-
-    //app->connections = &connections;
-    //app->fromToConnectionIndex = fromToConnectionIndex;
+    app->graphModel = new FRModel(config, &nodeData, &edgeData, &fromToConnectionIndex);
 
     app->SetAppState(AppState::RUN);
     app->Run();
