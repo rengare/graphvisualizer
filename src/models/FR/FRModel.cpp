@@ -138,8 +138,6 @@ void FRModel::UpdateNodes()
 
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-	// VertexData *data = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(VertexData), bufMask);
 }
 
 void FRModel::UpdateEdges()
@@ -219,20 +217,6 @@ void FRModel::DrawGui()
 	{
 		ImGui::Checkbox("Show edge", &config.showEdge);
 		ImGui::Checkbox("Update", &config.isUpdateOn);
-		// if (ImGui::InputInt("Find node", &nodeIndex))
-		// {
-		//     //if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
-		//     //{
-		//     //    auto pos = nodes.GetPosition(nodeIndex);
-
-		//     //    pos *= -0.5;
-		//     //    pos.z -= 50;
-
-		//     //    camera->cameraPosition = glm::vec3(pos.x, pos.y, pos.z);
-		//     //    camera->MakePosition();
-		//     //    camera->Forward();
-		//     //}
-		// };
 
 		if (ImGui::InputFloat("speed", &speed))
 		{
