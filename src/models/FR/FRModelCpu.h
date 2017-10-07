@@ -55,11 +55,10 @@ class FRModelCpu : public IModel
     vector<ConnectionIndices> *fromToConnections;
 
     GLuint nodeVao;
-    GLuint nodeSsbo;
-    GLuint fromToSsbo;
+    GLuint nodeSbo;
 
     GLuint edgeVao;
-    GLuint edgeSsbo;
+    GLuint edgeSbo;
 
     Shader *nodeShader, *edgeShader;
 

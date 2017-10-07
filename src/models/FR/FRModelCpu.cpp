@@ -8,7 +8,7 @@ FRModelCpu::FRModelCpu()
 
 FRModelCpu::~FRModelCpu()
 {
-	glDeleteBuffers(1, &nodeSsbo);
+	glDeleteBuffers(1, &nodeSbo);
 }
 
 FRModelCpu::FRModelCpu(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
@@ -34,11 +34,8 @@ void FRModelCpu::PrepareNodes()
 	glGenVertexArrays(1, &nodeVao);
 	glBindVertexArray(nodeVao);
 
-	glGenBuffers(1, &nodeSsbo);
-	glGenBuffers(1, &fromToSsbo);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
+	glGenBuffers(1, &nodeSbo);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 
 	int positionLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_position");
@@ -57,13 +54,6 @@ void FRModelCpu::PrepareNodes()
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
 
-	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
-	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
-
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
@@ -72,33 +62,24 @@ void FRModelCpu::PrepareEdges()
 	glGenVertexArrays(1, &edgeVao);
 	glBindVertexArray(edgeVao);
 
-	glGenBuffers(1, &edgeSsbo);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, edgeVao);
+	glGenBuffers(1, &edgeSbo);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
 	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
-
+	
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
-
+	
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
-
+	
 	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)0);
 	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)(offsetof(VertexData, VertexData::color)));
-
+	
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
-
-	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
-	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
-
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
+	
+	glEnableVertexAttribArray(0);
 }
 
 void FRModelCpu::Update()
@@ -131,7 +112,7 @@ void FRModelCpu::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_
 
 void FRModelCpu::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
 
 	glUseProgram(nodeShader->GetShaderProgram());
 
@@ -149,7 +130,7 @@ void FRModelCpu::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &
 
 void FRModelCpu::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
 
 	glUseProgram(edgeShader->GetShaderProgram());
 
@@ -171,20 +152,6 @@ void FRModelCpu::DrawGui()
 	{
 		ImGui::Checkbox("Show edge", &config.showEdge);
 		ImGui::Checkbox("Update", &config.isUpdateOn);
-		// if (ImGui::InputInt("Find node", &nodeIndex))
-		// {
-		//     //if (nodeIndex >= 0 && nodeIndex <= nodeCount - 1)
-		//     //{
-		//     //    auto pos = nodes.GetPosition(nodeIndex);
-
-		//     //    pos *= -0.5;
-		//     //    pos.z -= 50;
-
-		//     //    camera->cameraPosition = glm::vec3(pos.x, pos.y, pos.z);
-		//     //    camera->MakePosition();
-		//     //    camera->Forward();
-		//     //}
-		// };
 
 		if (ImGui::InputFloat("speed", &speed))
 		{
@@ -213,8 +180,13 @@ void FRModelCpu::DrawGui()
 
 void FRModelCpu::Clear()
 {
-	glDeleteBuffers(1, &nodeSsbo);
-	glDeleteBuffers(1, &edgeSsbo);
+	glDeleteBuffers(1, &nodeSbo);
+	glDeleteBuffers(1, &edgeSbo);
+	glDeleteBuffers(1, &edgeVao);
+	glDeleteBuffers(1, &nodeVao);
+
+	nodeShader->Clear();
+	edgeShader->Clear();
 }
 
 void FRModelCpu::FruchtermanReingold()
@@ -328,8 +300,12 @@ void FRModelCpu::FruchtermanReingold()
 
 void FRModelCpu::UpdateNodes()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
+	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 }
 
 void FRModelCpu::UpdateEdges()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
+	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
 }

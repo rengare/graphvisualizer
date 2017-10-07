@@ -18,6 +18,7 @@ public:
 	ComputeShader() {};
     ComputeShader(string shaderFile);
 	GLuint GetShaderProgram();
+	void Clear();
 
 private:
 	bool LoadShader(string fileName);

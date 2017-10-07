@@ -17,7 +17,9 @@
 #include "../graphic/camera/Camera.h"
 #include "../config/AppConfig.h"
 #include "../graphic/Renderer.h"
+#include "../graphic/GraphicsStructure.h"
 #include "../helper/Logger.h"
+#include "../helper/ModelCreator.h"
 #include "../graphic/camera/Camera.h"
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
@@ -25,6 +27,10 @@
 #include "../graphic/GraphicsStructure.h"
 
 #include "../models/IModel.h"
+
+
+#include "../models/FR/FRModel.h"
+#include "../models/FR/FRModelCpu.h"
 
 using namespace std;
 
@@ -49,10 +55,8 @@ public:
   void SetAppState(AppState state);
   void SetNodesCount(int count);
 
-  std::vector<Connections> *connections;
-  std::vector<ConnectionIndices> fromToConnectionIndex;
-
-  IModel *graphModel;
+  IModel *graphModel = nullptr;
+  ModelData* modelData = nullptr;
 
 private:
   bool InitSdl();
@@ -65,7 +69,7 @@ private:
 
   void RenderGui();
 
-  void Fruchterman_Reingold();
+  void CreateModel(int algorithmIndex);
 
 private:
   AppState appState;
@@ -90,6 +94,7 @@ private:
   float speed = 1;
   float area = 1000;
   float gravity = 10;
+  int algorithmIndex = 0;
 };
 
 #endif

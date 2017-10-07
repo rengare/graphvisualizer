@@ -8,7 +8,6 @@ FRModel::FRModel()
 
 FRModel::~FRModel()
 {
-	glDeleteBuffers(1, &nodeSsbo);
 }
 
 FRModel::FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
@@ -80,7 +79,7 @@ void FRModel::PrepareEdges()
 	glGenBuffers(1, &edgeSsbo);
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, edgeVao);
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
 
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
@@ -263,4 +262,17 @@ void FRModel::Clear()
 {
 	glDeleteBuffers(1, &nodeSsbo);
 	glDeleteBuffers(1, &edgeSsbo);
+	glDeleteBuffers(1, &fromToSsbo);
+
+	glDeleteBuffers(1, &nodeVao);
+	glDeleteBuffers(1, &edgeVao);
+
+	nodeShader->Clear();
+	edgeShader->Clear();
+
+	repulsiveCompute->Clear();
+	attractiveCompute->Clear();
+	updateCompute->Clear();
+	linesCompute->Clear();
+	
 }

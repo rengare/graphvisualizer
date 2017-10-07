@@ -1,7 +1,5 @@
 #include "App.h"
 
-static int algorithmIndex = 0;
-
 App::App(AppConfig config)
 {
     this->config = config;
@@ -58,6 +56,7 @@ bool App::InitRenderer()
 
 void App::Run()
 {
+    CreateModel(0);
     while (appState == AppState::RUN)
     {
         glClearColor(config.red / 255, config.green / 255, config.blue / 255, 1.f);
@@ -76,7 +75,10 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
-    graphModel->Update();
+    if (graphModel != nullptr)
+    {
+        graphModel->Update();
+    }
 
     camera->Update();
 }
@@ -90,7 +92,10 @@ void App::Draw()
     // nodes.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
     // edges.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
-    graphModel->Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
+    if (graphModel != nullptr)
+    {
+        graphModel->Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
+    }
 
     RenderGui();
     renderer->EndDraw();
@@ -288,15 +293,32 @@ void App::RenderGui()
 
     ImGui::Begin("Algorithms");
     {
-        ImGui::RadioButton("F-R gpu", &algorithmIndex, 0);
+        if (ImGui::RadioButton("F-R gpu", &algorithmIndex, 0))
+        {
+            CreateModel(algorithmIndex);
+        }
         ImGui::SameLine();
-        ImGui::RadioButton("F-R cpu", &algorithmIndex, 1);
+        if(ImGui::RadioButton("F-R cpu", &algorithmIndex, 1)){
+            CreateModel(algorithmIndex);
+        };
         ImGui::SameLine();
     }
 
     ImGui::End();
 
-    graphModel->DrawGui();
+    if (graphModel != nullptr)
+    {
+        graphModel->DrawGui();
+    }
 
     ImGui::Render();
+}
+
+void App::CreateModel(int algorithmIndex)
+{
+    if(graphModel != nullptr){
+        graphModel->Clear();
+        graphModel = nullptr;
+    }
+    graphModel = ModelCreator::GetModelByType(modelData, &config, algorithmIndex);
 }

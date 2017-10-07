@@ -4,9 +4,9 @@
 
 #include "helper/RandomNumberGenerator.h"
 #include "config/AppConfig.h"
+#include "graphic/GraphicsStructure.h"
 #include "system/App.h"
 #include "graphic/Shader.h"
-#include "models/FR/FRModel.h"
 
 using json = nlohmann::json;
 
@@ -121,7 +121,9 @@ int main(int argc, char *argv[])
 
     app->SetNodesCount((int) uniqueEdge.size());
 
-    app->graphModel = new FRModel(config, &nodeData, &edgeData, &fromToConnectionIndex);
+    app->modelData = new ModelData(&nodeData, &edgeData, &fromToConnectionIndex);
+
+    // app->graphModel = new FRModelCpu(config, &nodeData, &edgeData, &fromToConnectionIndex);
 
     app->SetAppState(AppState::RUN);
     app->Run();

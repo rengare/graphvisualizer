@@ -91,3 +91,7 @@ GLuint ComputeShader::GetShaderProgram()
 {
     return shaderProgram;
 }
+
+void ComputeShader::Clear(){
+    glDeleteProgram(shaderProgram);	    
+}
