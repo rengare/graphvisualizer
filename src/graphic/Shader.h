@@ -28,6 +28,8 @@ public:
 	
 	GLuint GetShaderProgram();
 
+	void Clear();
+
 private:
 	bool LoadVertexShader(GLuint& shaderProgram, string fileName);
 	bool LoadFragmentShader(GLuint& shaderProgram, string fileName);

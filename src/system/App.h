@@ -2,7 +2,7 @@
 #define APP_H
 
 #ifdef _WIN32
-  #define min(a,b)  ((a < b) ? a : b)
+#define min(a, b) ((a < b) ? a : b)
 #endif
 
 #include <glad/glad.h>
@@ -17,12 +17,20 @@
 #include "../graphic/camera/Camera.h"
 #include "../config/AppConfig.h"
 #include "../graphic/Renderer.h"
+#include "../graphic/GraphicsStructure.h"
 #include "../helper/Logger.h"
+#include "../helper/ModelCreator.h"
 #include "../graphic/camera/Camera.h"
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl_gl3.h"
 
-#include "../models/FRModel.h"
+#include "../graphic/GraphicsStructure.h"
+
+#include "../models/IModel.h"
+
+
+#include "../models/FR/FRModel.h"
+#include "../models/FR/FRModelCpu.h"
 
 using namespace std;
 
@@ -47,12 +55,8 @@ public:
   void SetAppState(AppState state);
   void SetNodesCount(int count);
 
-  std::vector<Connections> *connections;
-  std::vector<ConnectionIndices> fromToConnectionIndex;
-
-  //InstancedModel nodes;
-  //InstancedModel edges;
-  FRModel graphModel;
+  IModel *graphModel = nullptr;
+  ModelData* modelData = nullptr;
 
 private:
   bool InitSdl();
@@ -65,7 +69,7 @@ private:
 
   void RenderGui();
 
-  void Fruchterman_Reingold();
+  void CreateModel(int algorithmIndex);
 
 private:
   AppState appState;
@@ -79,17 +83,18 @@ private:
   glm::mat4 projectionMatrix;
   glm::mat4 viewMatrix;
 
-
   int nodeCount;
   int nodeIndex = 0;
-  int currentNodeIteration = 0;
 
+  int currentNodeIteration = 0;
   int currentEdgeIteration = 0;
+
   float SPEED_DIVISOR = 800;
   float AREA_MULTIPLICATOR = 10000;
   float speed = 1;
   float area = 1000;
   float gravity = 10;
+  int algorithmIndex = 0;
 };
 
 #endif

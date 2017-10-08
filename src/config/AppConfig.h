@@ -9,6 +9,7 @@ struct AppConfig
     int height = 620;
     int positionX = 400;
     int positionY = 100;
+    bool showGui = true;
     bool isVsyncEnabled = true;
     std::string name = "The project";
     float red = 0.f;

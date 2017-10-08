@@ -28,6 +28,7 @@ Shader::Shader(string shaderProgramName, string vertexFileName, string fragmentF
 
 Shader::~Shader()
 {
+	glDeleteProgram(shaderProgram);
 }
 
 GLint Shader::GetAttributeLocationBy(string name)
@@ -145,4 +146,8 @@ bool Shader::Link(GLuint & shaderProgram)
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &isLinked);
 
 	return isLinked;
+}
+
+void Shader::Clear(){
+	glDeleteProgram(shaderProgram);	
 }
