@@ -25,19 +25,32 @@ FRModelCpu::FRModelCpu(AppConfig config, vector<VertexData> *nodeData, vector<Ve
 	edgeSize = (*edgeVertices).size();
 	fromToConnectionSize = (*fromToConnections).size();
 
+	PrepareBuffers();
 	PrepareEdges();
 	PrepareNodes();
 }
 
-void FRModelCpu::PrepareNodes()
+void FRModelCpu::PrepareBuffers()
 {
-	glGenVertexArrays(1, &nodeVao);
-	glBindVertexArray(nodeVao);
-
 	glGenBuffers(1, &nodeSbo);
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glGenBuffers(1, &edgeSbo);
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
+	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	glGenVertexArrays(1, &nodeVao);
+	glGenVertexArrays(1, &edgeVao);	
+}
+
+void FRModelCpu::PrepareNodes()
+{
+	glBindVertexArray(nodeVao);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
+	
 	int positionLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_color");
 	int sizeLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_size");
@@ -54,32 +67,29 @@ void FRModelCpu::PrepareNodes()
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);	
 	glBindVertexArray(0);
 }
 
 void FRModelCpu::PrepareEdges()
 {
-	glGenVertexArrays(1, &edgeVao);
 	glBindVertexArray(edgeVao);
-
-	glGenBuffers(1, &edgeSbo);
-	
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
-	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
-	
+
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
-	
+
 	glEnableVertexAttribArray(positionLocation);
 	glEnableVertexAttribArray(colorLocation);
-	
+
 	glVertexAttribPointer(positionLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)0);
 	glVertexAttribPointer(colorLocation, 4, GL_FLOAT, GL_FALSE, sizeof(VertexData), (void *)(offsetof(VertexData, VertexData::color)));
-	
+
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
-	
-	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);	
+	glBindVertexArray(0);
 }
 
 void FRModelCpu::Update()
@@ -123,8 +133,8 @@ void FRModelCpu::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &
 
 	glDrawArrays(GL_POINTS, 0, nodeSize);
 
-	glUseProgram(0);
 	glBindVertexArray(0);
+	glUseProgram(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -141,8 +151,8 @@ void FRModelCpu::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &
 
 	glDrawArrays(GL_LINES, 0, edgeSize);
 
-	glUseProgram(0);
 	glBindVertexArray(0);
+	glUseProgram(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -182,8 +192,9 @@ void FRModelCpu::Clear()
 {
 	glDeleteBuffers(1, &nodeSbo);
 	glDeleteBuffers(1, &edgeSbo);
-	glDeleteBuffers(1, &edgeVao);
-	glDeleteBuffers(1, &nodeVao);
+
+	glDeleteVertexArrays(1, &nodeVao);
+	glDeleteVertexArrays(1, &edgeVao);
 
 	nodeShader->Clear();
 	edgeShader->Clear();

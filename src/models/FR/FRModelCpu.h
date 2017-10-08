@@ -37,6 +37,8 @@ class FRModelCpu : public IModel
     void Clear() override;
 
   private:
+    void PrepareBuffers();
+
     void PrepareNodes();
     void PrepareEdges();
     

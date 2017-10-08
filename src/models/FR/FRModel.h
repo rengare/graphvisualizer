@@ -36,8 +36,9 @@ public:
   void Clear() override;
 
 private:
-  void PrepareNodes();
+  void PrepareBuffers();
 
+  void PrepareNodes();
   void PrepareEdges();
 
   void UpdateNodes();

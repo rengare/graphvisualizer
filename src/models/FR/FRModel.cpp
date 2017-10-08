@@ -29,21 +29,37 @@ FRModel::FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexDa
 	edgeSize = (*edgeVertices).size();
 	fromToConnectionSize = (*fromToConnections).size();
 
+	PrepareBuffers();
+
 	PrepareEdges();
 	PrepareNodes();
 }
 
-void FRModel::PrepareNodes()
+void FRModel::PrepareBuffers()
 {
-	glGenVertexArrays(1, &nodeVao);
-	glBindVertexArray(nodeVao);
-
 	glGenBuffers(1, &nodeSsbo);
-	glGenBuffers(1, &fromToSsbo);
-	glEnableVertexAttribArray(0);
-
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glGenBuffers(1, &fromToSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
+	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenBuffers(1, &edgeSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
+	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &nodeVao);
+	glGenVertexArrays(1, &edgeVao);	
+}
+
+void FRModel::PrepareNodes()
+{
+	glBindVertexArray(nodeVao);
+	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 
 	int positionLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_color");
@@ -60,10 +76,7 @@ void FRModel::PrepareNodes()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
-
-	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
-	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
-
+	
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 
@@ -73,15 +86,9 @@ void FRModel::PrepareNodes()
 
 void FRModel::PrepareEdges()
 {
-	glGenVertexArrays(1, &edgeVao);
 	glBindVertexArray(edgeVao);
-
-	glGenBuffers(1, &edgeSsbo);
-	glEnableVertexAttribArray(0);
-
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
-
+		
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
 
@@ -103,6 +110,9 @@ void FRModel::PrepareEdges()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 void FRModel::Update()
@@ -188,8 +198,8 @@ void FRModel::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 
 	glDrawArrays(GL_POINTS, 0, nodeSize);
 
-	glUseProgram(0);
 	glBindVertexArray(0);
+	glUseProgram(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -206,8 +216,8 @@ void FRModel::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &vie
 
 	glDrawArrays(GL_LINES, 0, edgeSize);
 
-	glUseProgram(0);
 	glBindVertexArray(0);
+	glUseProgram(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -232,7 +242,8 @@ void FRModel::DrawGui()
 
 		if (ImGui::InputFloat("area", &area))
 		{
-			if(area <= 0.0){
+			if (area <= 0.0)
+			{
 				area = 0.1;
 			}
 		};
@@ -248,8 +259,8 @@ void FRModel::Clear()
 	glDeleteBuffers(1, &edgeSsbo);
 	glDeleteBuffers(1, &fromToSsbo);
 
-	glDeleteBuffers(1, &nodeVao);
-	glDeleteBuffers(1, &edgeVao);
+	glDeleteVertexArrays(1, &nodeVao);
+	glDeleteVertexArrays(1, &edgeVao);
 
 	nodeShader->Clear();
 	edgeShader->Clear();
@@ -258,5 +269,4 @@ void FRModel::Clear()
 	attractiveCompute->Clear();
 	updateCompute->Clear();
 	linesCompute->Clear();
-	
 }
