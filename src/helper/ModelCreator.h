@@ -8,6 +8,7 @@
 #include "../models/IModel.h"
 #include "../models/FR/FRModelCpu.h"
 #include "../models/FR/FRModel.h"
+#include "../models/random/RandomModel.h"
 
 namespace ModelCreator
 {
@@ -19,8 +20,10 @@ static IModel *GetModelByType(ModelData *data, AppConfig *config, int type)
         return new FRModel(*config, data->nodeData, data->edgeData, data->fromToConnections);
     case 1:
         return new FRModelCpu(*config, data->nodeData, data->edgeData, data->fromToConnections);
-        // return nullptr;
+    case 2:
+        return new RandomModel(*config, data->nodeData, data->edgeData, data->fromToConnections);
     }
+
 }
 };
 
