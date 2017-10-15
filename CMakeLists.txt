@@ -50,6 +50,9 @@ set(SOURCE_FILES
         src/models/FR/FRModelCpu.h
         src/models/FR/FRModelCpu.cpp 
 
+        src/models/random/RandomModel.h
+        src/models/random/RandomModel.cpp 
+
         src/main.cpp
         # src/test.cpp
         )

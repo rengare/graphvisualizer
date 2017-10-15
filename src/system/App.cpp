@@ -302,6 +302,10 @@ void App::RenderGui()
             CreateModel(algorithmIndex);
         };
         ImGui::SameLine();
+
+        if(ImGui::RadioButton("Random gpu", &algorithmIndex, 2)){
+            CreateModel(algorithmIndex);
+        };
     }
 
     ImGui::End();
