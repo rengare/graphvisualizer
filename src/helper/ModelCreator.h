@@ -17,11 +17,11 @@ static IModel *GetModelByType(ModelData *data, AppConfig *config, int type)
     switch (type)
     {
     case 0:
-        return new FRModel(*config, data->nodeData, data->edgeData, data->fromToConnections);
+        return new FRModel(config, data->nodeData, data->edgeData, data->fromToConnections);
     case 1:
-        return new FRModelCpu(*config, data->nodeData, data->edgeData, data->fromToConnections);
+        return new FRModelCpu(config, data->nodeData, data->edgeData, data->fromToConnections);
     case 2:
-        return new RandomModel(*config, data->nodeData, data->edgeData, data->fromToConnections);
+        return new RandomModel(config, data->nodeData, data->edgeData, data->fromToConnections);
     }
 
 }

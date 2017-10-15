@@ -25,7 +25,7 @@ class FRModel : public IModel
 public:
   FRModel();
   ~FRModel();
-  FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
+  FRModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
   void Update() override;
 
@@ -70,7 +70,7 @@ private:
   int nodeSize;
   int edgeSize;
   int fromToConnectionSize;
-  AppConfig config;
+  AppConfig *config;
 
   float speed = 1.0;
   float area = 100.0;

@@ -293,6 +293,9 @@ void App::RenderGui()
 
     ImGui::Begin("Algorithms");
     {
+        ImGui::Checkbox("Show edge", &config.showEdge);
+        ImGui::Checkbox("Update", &config.isUpdateOn);
+        
         if (ImGui::RadioButton("F-R gpu", &algorithmIndex, 0))
         {
             CreateModel(algorithmIndex);
@@ -301,7 +304,6 @@ void App::RenderGui()
         if(ImGui::RadioButton("F-R cpu", &algorithmIndex, 1)){
             CreateModel(algorithmIndex);
         };
-        ImGui::SameLine();
 
         if(ImGui::RadioButton("Random gpu", &algorithmIndex, 2)){
             CreateModel(algorithmIndex);

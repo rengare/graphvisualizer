@@ -10,10 +10,10 @@ FRModel::~FRModel()
 {
 }
 
-FRModel::FRModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
+FRModel::FRModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
 {
-	this->nodeShader = new Shader(config.nodeShaderName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-	this->edgeShader = new Shader(config.lineShaderName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
+	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
 	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
@@ -117,7 +117,7 @@ void FRModel::PrepareEdges()
 
 void FRModel::Update()
 {
-	if (config.isUpdateOn)
+	if (config->isUpdateOn)
 	{
 		UpdateNodes();
 		UpdateEdges();
@@ -179,7 +179,7 @@ void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_mat
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
 
-	if (config.showEdge)
+	if (config->showEdge)
 	{
 		DrawEdges(projection_matrix, view_matrix, cameraPosition);
 	};
@@ -225,9 +225,6 @@ void FRModel::DrawGui()
 {
 	ImGui::Begin("Graph settings");
 	{
-		ImGui::Checkbox("Show edge", &config.showEdge);
-		ImGui::Checkbox("Update", &config.isUpdateOn);
-
 		if (ImGui::InputFloat("speed", &speed))
 		{
 			if (speed < 0.0)

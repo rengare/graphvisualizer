@@ -11,10 +11,10 @@ FRModelCpu::~FRModelCpu()
 	glDeleteBuffers(1, &nodeSbo);
 }
 
-FRModelCpu::FRModelCpu(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
+FRModelCpu::FRModelCpu(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
 {
-	this->nodeShader = new Shader(config.nodeShaderName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-	this->edgeShader = new Shader(config.lineShaderName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
+	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
 	this->bufferVertices = nodeData;
 	this->edgeVertices = edgeData;
@@ -94,7 +94,7 @@ void FRModelCpu::PrepareEdges()
 
 void FRModelCpu::Update()
 {
-	if (config.isUpdateOn)
+	if (config->isUpdateOn)
 	{
 		FruchtermanReingold();
 	};
@@ -114,7 +114,7 @@ void FRModelCpu::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
 
-	if (config.showEdge)
+	if (config->showEdge)
 	{
 		DrawEdges(projection_matrix, view_matrix, cameraPosition);
 	};
@@ -160,9 +160,6 @@ void FRModelCpu::DrawGui()
 {
 	ImGui::Begin("Graph settings");
 	{
-		ImGui::Checkbox("Show edge", &config.showEdge);
-		ImGui::Checkbox("Update", &config.isUpdateOn);
-
 		if (ImGui::InputFloat("speed", &speed))
 		{
 			if (speed < 0.0)
@@ -288,7 +285,7 @@ void FRModelCpu::FruchtermanReingold()
 
 			pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
 			pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
-			if (config.graphType3d)
+			if (config->graphType3d)
 			{
 				pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
 			}

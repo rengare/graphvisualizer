@@ -10,10 +10,10 @@ RandomModel::~RandomModel()
 {
 }
 
-RandomModel::RandomModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
+RandomModel::RandomModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
 {
-	this->nodeShader = new Shader(config.nodeShaderName, config.nodeShaderVertexPath, config.nodeShaderFragmentPath);
-	this->edgeShader = new Shader(config.lineShaderName, config.lineShaderVertexPath, config.lineShaderFragmentPath);
+	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
+	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
 	this->nodeCompute = new ComputeShader("res/shaders/random/random_positionupdate.comp");
 	this->edgeCompute = new ComputeShader("res/shaders/random/random_lines.comp");
@@ -115,7 +115,7 @@ void RandomModel::PrepareEdges()
 
 void RandomModel::Update()
 {
-	if (config.isUpdateOn)
+	if (config->isUpdateOn)
 	{
 		RandomPosition();
 	}
@@ -152,7 +152,7 @@ void RandomModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
 
-	if (config.showEdge)
+	if (config->showEdge)
 	{
 		DrawEdges(projection_matrix, view_matrix, cameraPosition);
 	};
@@ -198,14 +198,11 @@ void RandomModel::DrawGui()
 {
 	ImGui::Begin("Graph settings");
 	{
-		ImGui::Checkbox("Show edge", &config.showEdge);
-		ImGui::Checkbox("Update", &config.isUpdateOn);
-
 		if (ImGui::InputFloat("Limit", &limit))
 		{
 			if (limit <= 0.0)
 			{
-				limit = 1;
+				limit = 1.0;
 			}
 		};
 	}

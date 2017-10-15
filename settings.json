@@ -12,6 +12,8 @@
     "graphType3d": true,
     "showEdge": true,
     "isUpdateOn": false,
+    "nodeSizeRangeStart":5,
+    "nodeSizeRangeEnd":10,
     "nodeShaderName": "nodes",
     "lineShaderName": "lines",
     "nodeShaderVertexPath": "res/shaders/circle.vert",

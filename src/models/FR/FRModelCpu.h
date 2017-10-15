@@ -26,7 +26,7 @@ class FRModelCpu : public IModel
   public:
     FRModelCpu();
     ~FRModelCpu();
-    FRModelCpu(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
+    FRModelCpu(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
     void Update() override;
 
@@ -67,7 +67,7 @@ class FRModelCpu : public IModel
     int nodeSize;
     int edgeSize;
     int fromToConnectionSize;
-    AppConfig config;
+    AppConfig *config;
 
     float SPEED_DIVISOR = 800;
     float AREA_MULTIPLICATOR = 10000;

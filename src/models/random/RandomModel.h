@@ -25,7 +25,7 @@ class RandomModel : public IModel
 public:
   RandomModel();
   ~RandomModel();
-  RandomModel(AppConfig config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
+  RandomModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
   void Update() override;
 
@@ -67,7 +67,7 @@ private:
   int nodeSize;
   int edgeSize;
   int fromToConnectionSize;
-  AppConfig config;
+  AppConfig *config;
 
   float limit = 1.0;
   // float area = 100.0;

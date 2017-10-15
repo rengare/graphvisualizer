@@ -37,6 +37,8 @@ int main(int argc, char *argv[])
     config.lineShaderVertexPath = settingsJson["lineShaderVertexPath"].get<std::string>();
     config.lineShaderFragmentPath = settingsJson["lineShaderFragmentPath"].get<std::string>();
     config.edgeInput = settingsJson["edgeInput"].get<std::string>();
+    config.nodeSizeRangeStart = settingsJson["nodeSizeRangeStart"].get<int>();
+    config.nodeSizeRangeEnd = settingsJson["nodeSizeRangeEnd"].get<int>();
 
     std::vector<Connections> connections;
     std::vector<std::string> uniqueEdge;
@@ -58,7 +60,7 @@ int main(int argc, char *argv[])
 
     std::sort(uniqueEdge.begin(), uniqueEdge.end());
     auto it = std::unique(uniqueEdge.begin(), uniqueEdge.end());
-    uniqueEdge.resize((unsigned long) std::distance(uniqueEdge.begin(), it));
+    uniqueEdge.resize((unsigned long)std::distance(uniqueEdge.begin(), it));
 
     map<string, int> edgeIndexMap;
     for (int i = 0; i < uniqueEdge.size(); i++)
@@ -66,14 +68,13 @@ int main(int argc, char *argv[])
         edgeIndexMap[uniqueEdge[i]] = i;
     }
 
-
     std::vector<ConnectionIndices> fromToConnectionIndex;
     for (int i = 0; i < connections.size(); i++)
     {
-		ConnectionIndices fromTo;
+        ConnectionIndices fromTo;
         fromTo.from = edgeIndexMap[connections[i].from];
         fromTo.to = edgeIndexMap[connections[i].to];
-		fromToConnectionIndex.push_back(fromTo);
+        fromToConnectionIndex.push_back(fromTo);
     }
 
     auto app = new App(config);
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
         nodeData[i].color.g = RandomNumberGenerator(1, 10) / 10.f;
         nodeData[i].color.b = RandomNumberGenerator(1, 10) / 10.f;
         nodeData[i].color.a = 1;
-        nodeData[i].size = RandomNumberGenerator(10, 50);
+        nodeData[i].size = RandomNumberGenerator(config.nodeSizeRangeStart, config.nodeSizeRangeEnd);
         hostArrayIndex += 7;
     }
 
@@ -115,7 +116,7 @@ int main(int argc, char *argv[])
 
     std::cout << edgeData.size() << endl;
 
-    app->SetNodesCount((int) uniqueEdge.size());
+    app->SetNodesCount((int)uniqueEdge.size());
 
     app->modelData = new ModelData(&nodeData, &edgeData, &fromToConnectionIndex);
 
