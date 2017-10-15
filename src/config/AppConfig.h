@@ -15,8 +15,6 @@ struct AppConfig
     float red = 0.f;
     float green = 0.f;
     float blue = 0.f;
-    float randomLength;
-    float range;
     float skip;
     bool graphType3d;
     bool showEdge = true;

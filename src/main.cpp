@@ -27,9 +27,6 @@ int main(int argc, char *argv[])
     config.red = settingsJson["red"].get<float>();
     config.green = settingsJson["green"].get<float>();
     config.blue = settingsJson["blue"].get<float>();
-    config.randomLength = settingsJson["randomLength"].get<float>();
-    config.range = settingsJson["range"].get<float>();
-    config.skip = settingsJson["skip"].get<float>();
     config.graphType3d = settingsJson["graphType3d"].get<bool>();
     config.showEdge = settingsJson["showEdge"].get<bool>();
     config.isUpdateOn = settingsJson["isUpdateOn"].get<bool>();
@@ -89,7 +86,6 @@ int main(int argc, char *argv[])
     vector<VertexData> nodeData(uniqueEdge.size());
 
     int hostArrayIndex = 0;
-    int range = (int) config.range;
 
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
