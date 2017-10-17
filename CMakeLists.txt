@@ -47,6 +47,9 @@ set(SOURCE_FILES
         src/models/FR/FRModel.h
         src/models/FR/FRModel.cpp 
 
+        src/models/FR/FRModelImproved.h
+        src/models/FR/FRModelImproved.cpp 
+
         src/models/FR/FRModelCpu.h
         src/models/FR/FRModelCpu.cpp 
 
