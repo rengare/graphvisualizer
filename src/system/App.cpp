@@ -301,10 +301,15 @@ void App::RenderGui()
             CreateModel(algorithmIndex);
         }
         ImGui::SameLine();
+        if (ImGui::RadioButton("F-R gpu improved", &algorithmIndex, 3))
+        {
+            CreateModel(algorithmIndex);
+        }
+        ImGui::SameLine();
         if(ImGui::RadioButton("F-R cpu", &algorithmIndex, 1)){
             CreateModel(algorithmIndex);
         };
-
+        
         if(ImGui::RadioButton("Random gpu", &algorithmIndex, 2)){
             CreateModel(algorithmIndex);
         };

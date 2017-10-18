@@ -15,7 +15,9 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
-	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
+	this->repulsivePositionCalc = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_calc.comp");
+	// this->repulsivePositionUpdate = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_update.comp");
+
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
 	this->linesCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_lines.comp");
@@ -29,6 +31,8 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	edgeSize = (*edgeVertices).size();
 	fromToConnectionSize = (*fromToConnections).size();
 
+	repulsivePositions = new vector<glm::vec4>(nodeSize);
+
 	PrepareBuffers();
 
 	PrepareEdges();
@@ -40,6 +44,11 @@ void FRModelImproved::PrepareBuffers()
 	glGenBuffers(1, &nodeSsbo);
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glGenBuffers(1, &repulsiveSsbo);
+	glBindBuffer(GL_ARRAY_BUFFER, repulsiveSsbo);
+	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(glm::vec4), &(*repulsivePositions)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glGenBuffers(1, &fromToSsbo);
@@ -79,6 +88,7 @@ void FRModelImproved::PrepareNodes()
 	
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 15, repulsiveSsbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -128,11 +138,17 @@ void FRModelImproved::UpdateNodes()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 
-	//repulsive
-	glUseProgram(repulsiveCompute->GetShaderProgram());
-	PassUniforms(repulsiveCompute->GetShaderProgram());
+	// repulsivePositionCalc
+	glUseProgram(repulsivePositionCalc->GetShaderProgram());
+	PassUniforms(repulsivePositionCalc->GetShaderProgram());
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+	// //repulsivePositionUpdate
+	// glUseProgram(repulsivePositionUpdate->GetShaderProgram());
+	// PassUniforms(repulsivePositionUpdate->GetShaderProgram());
+	// glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
+	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
 	glUseProgram(attractiveCompute->GetShaderProgram());
@@ -255,6 +271,7 @@ void FRModelImproved::Clear()
 	glDeleteBuffers(1, &nodeSsbo);
 	glDeleteBuffers(1, &edgeSsbo);
 	glDeleteBuffers(1, &fromToSsbo);
+	glDeleteBuffers(1, &repulsiveSsbo);
 
 	glDeleteVertexArrays(1, &nodeVao);
 	glDeleteVertexArrays(1, &edgeVao);
@@ -262,7 +279,8 @@ void FRModelImproved::Clear()
 	nodeShader->Clear();
 	edgeShader->Clear();
 
-	repulsiveCompute->Clear();
+	repulsivePositionCalc->Clear();
+	repulsivePositionUpdate->Clear();
 	attractiveCompute->Clear();
 	updateCompute->Clear();
 	linesCompute->Clear();

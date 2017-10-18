@@ -52,9 +52,11 @@ private:
   vector<VertexData> *bufferVertices;
   vector<VertexData> *edgeVertices;
   vector<ConnectionIndices> *fromToConnections;
+  vector<glm::vec4> *repulsivePositions;
 
   GLuint nodeVao;
   GLuint nodeSsbo;
+  GLuint repulsiveSsbo;
   GLuint fromToSsbo;
 
   GLuint edgeVao;
@@ -62,7 +64,9 @@ private:
 
   Shader *nodeShader, *edgeShader;
 
-  ComputeShader *repulsiveCompute;
+  ComputeShader *repulsivePositionCalc;
+  ComputeShader *repulsivePositionUpdate;
+
   ComputeShader *attractiveCompute;
   ComputeShader *updateCompute;
   ComputeShader *linesCompute;
