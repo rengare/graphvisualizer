@@ -280,7 +280,7 @@ void FRModelImproved::Clear()
 	edgeShader->Clear();
 
 	repulsivePositionCalc->Clear();
-	repulsivePositionUpdate->Clear();
+	// repulsivePositionUpdate->Clear();
 	attractiveCompute->Clear();
 	updateCompute->Clear();
 	linesCompute->Clear();
