@@ -34,10 +34,12 @@ layout (std430, binding = 8) buffer DataConnections
 	Connections connections[];
 };
 
-layout (std430, binding = 15) buffer RepulsiveBuffer 
-{
-	vec4 repulsiveDistances[];
-};
+// layout (std430, binding = 15) buffer RepulsiveBuffer 
+// {
+// 	vec4 repulsiveDistances[];
+// };
+
+// shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
 layout( location = 1 ) uniform int graphDataSize;
 layout( location = 9 ) uniform int connectionSize;
@@ -50,33 +52,39 @@ void syncronize()
 
 void main(void)
 {
+    uint globalIndex = gl_GlobalInvocationID.x;
+    if(globalIndex > graphDataSize) return;
+    
     float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
     float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
+    k = k * k;
 
-    uint globalIndex = gl_GlobalInvocationID.x;
-    
-    if(globalIndex > graphDataSize) return;
+    GraphicData currentModel = data[globalIndex];
 
-    vec3 calculatedDistance = vec3(0) ;
+    currentModel.dx = 0;
+    currentModel.dy = 0;
+    currentModel.dz = 0;
+
 
     for (uint j = 0; j < graphDataSize; j++)
     {
+        GraphicData model = data[j];
+        vec4 dist = currentModel.position - model.position;
+        float distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+        float repulsive = k / distSqrt;
+
+        vec4 calculateddistances = vec4(dist.x, dist.y, dist.z, 0) ;
+        
+        calculateddistances = calculateddistances / distSqrt;
+        calculateddistances = calculateddistances * repulsive;
+
         if (globalIndex != j)
         {
-            float xDist = data[globalIndex].position[0] - data[j].position[0];
-            float yDist = data[globalIndex].position[1] - data[j].position[1];
-            float zDist = data[globalIndex].position[2] - data[j].position[2];
-            float dist = sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-            float repulsive = (k * k) / dist;
-            
-
-            calculatedDistance.x += xDist / dist * repulsive;
-            calculatedDistance.y += yDist / dist * repulsive;
-            calculatedDistance.z += zDist / dist * repulsive;
+            currentModel.dx += calculateddistances.x; 
+            currentModel.dy += calculateddistances.y;
+            currentModel.dz += calculateddistances.z;
         }
-    }
+        }
 
-    data[globalIndex].dx = calculatedDistance.x;
-    data[globalIndex].dy = calculatedDistance.y;
-    data[globalIndex].dz = calculatedDistance.z;
+    data[globalIndex] = currentModel;
 }

@@ -42,7 +42,7 @@ layout (std430, binding = 11) buffer RepulsiveBuffer
 layout( location = 1 ) uniform int graphDataSize;
 layout( location = 9 ) uniform int connectionSize;
 
-// shared vec4 localPositions[ gl_WorkGroupSize.x ];
+shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
 void syncronize()
 {
@@ -52,10 +52,10 @@ void syncronize()
 
 void main(void)
 {
+    uint globalIndex = gl_GlobalInvocationID.x;
     // float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
     // float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
 
-    // uint globalIndex = gl_GlobalInvocationID.x;
     // uint localIndex =  gl_LocalInvocationID.x;
     
     // if(globalIndex > graphDataSize) return;
@@ -64,7 +64,7 @@ void main(void)
     // data[globalIndex].dy = 0;
     // data[globalIndex].dz = 0;
     
-    // data[globalIndex].dx += repulsiveDistances[globalIndex].x;
-    // data[globalIndex].dy += repulsiveDistances[globalIndex].y;
-    // data[globalIndex].dz += repulsiveDistances[globalIndex].z;
+    // data[globalIndex].dx = localPositions[globalIndex].x;
+    // data[globalIndex].dy = localPositions[globalIndex].y;
+    // data[globalIndex].dz = localPositions[globalIndex].z;
 }

@@ -1,5 +1,5 @@
-#ifndef FR_MODEL_IMPROVED
-#define FR_MODEL_IMPROVED
+#ifndef FORCE_ATLAS_MODEL
+#define FORCE_ATLAS_MODEL
 
 #include <iostream>
 #include <vector>
@@ -20,12 +20,12 @@
 #include "../IModel.h"
 
 using namespace std;
-class FRModelImproved : public IModel
+class ForceAtlasModel : public IModel
 {
 public:
-  FRModelImproved();
-  ~FRModelImproved();
-  FRModelImproved(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
+  ForceAtlasModel();
+  ~ForceAtlasModel();
+  ForceAtlasModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
   void Update() override;
 
@@ -52,11 +52,9 @@ private:
   vector<VertexData> *bufferVertices;
   vector<VertexData> *edgeVertices;
   vector<ConnectionIndices> *fromToConnections;
-  vector<glm::vec4> *repulsivePositions;
 
   GLuint nodeVao;
   GLuint nodeSsbo;
-  GLuint repulsiveSsbo;
   GLuint fromToSsbo;
 
   GLuint edgeVao;
@@ -64,9 +62,7 @@ private:
 
   Shader *nodeShader, *edgeShader;
 
-  ComputeShader *repulsivePositionCalc;
-  ComputeShader *repulsivePositionUpdate;
-
+  ComputeShader *repulsiveCompute;
   ComputeShader *attractiveCompute;
   ComputeShader *updateCompute;
   ComputeShader *linesCompute;
@@ -76,7 +72,7 @@ private:
   int fromToConnectionSize;
   AppConfig *config;
 
-  float speed = 10.0;
+  float speed = 1.0;
   float area = 100.0;
   float gravity = 10.0;
 };

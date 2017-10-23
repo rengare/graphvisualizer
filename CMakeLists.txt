@@ -52,6 +52,9 @@ set(SOURCE_FILES
 
         src/models/FR/FRModelCpu.h
         src/models/FR/FRModelCpu.cpp 
+        
+        src/models/ForceAtlas/ForceAtlasModel.h
+        src/models/ForceAtlas/ForceAtlasModel.cpp 
 
         src/models/random/RandomModel.h
         src/models/random/RandomModel.cpp 
