@@ -16,5 +16,7 @@ sdl2win32
 graphvisualizer.dir
 Win32/
 
+graphvisualizer.wiki
+
 external/
 cmake-build-debug/
