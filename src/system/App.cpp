@@ -56,7 +56,7 @@ bool App::InitRenderer()
 
 void App::Run()
 {
-    CreateModel(0);
+    CreateModel(algorithmIndex);
     while (appState == AppState::RUN)
     {
         glClearColor(config.red / 255, config.green / 255, config.blue / 255, 1.f);
@@ -295,16 +295,23 @@ void App::RenderGui()
     {
         ImGui::Checkbox("Show edge", &config.showEdge);
         ImGui::Checkbox("Update", &config.isUpdateOn);
+
+        if (ImGui::RadioButton("F-R gpu improved", &algorithmIndex, 3))
+        {
+            CreateModel(algorithmIndex);
+        }
+        ImGui::SameLine();
         
         if (ImGui::RadioButton("F-R gpu", &algorithmIndex, 0))
         {
             CreateModel(algorithmIndex);
         }
         ImGui::SameLine();
+
         if(ImGui::RadioButton("F-R cpu", &algorithmIndex, 1)){
             CreateModel(algorithmIndex);
         };
-
+        
         if(ImGui::RadioButton("Random gpu", &algorithmIndex, 2)){
             CreateModel(algorithmIndex);
         };
