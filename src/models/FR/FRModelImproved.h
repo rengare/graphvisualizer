@@ -76,7 +76,7 @@ private:
   int fromToConnectionSize;
   AppConfig *config;
 
-  float speed = 10.0;
+  float speed = 100.0;
   float area = 100.0;
   float gravity = 10.0;
 };

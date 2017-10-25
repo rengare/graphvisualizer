@@ -1,6 +1,6 @@
 #include "FRModelImproved.h"
 
-const int GROUP_SIZE = 10;
+const int GROUP_SIZE = 256;
 
 FRModelImproved::FRModelImproved()
 {
@@ -45,12 +45,12 @@ void FRModelImproved::PrepareBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	glGenBuffers(1, &repulsiveSsbo);
 	glBindBuffer(GL_ARRAY_BUFFER, repulsiveSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(glm::vec4), &(*repulsivePositions)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	glGenBuffers(1, &fromToSsbo);
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
@@ -62,7 +62,7 @@ void FRModelImproved::PrepareBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &nodeVao);
-	glGenVertexArrays(1, &edgeVao);	
+	glGenVertexArrays(1, &edgeVao);
 }
 
 void FRModelImproved::PrepareNodes()
@@ -85,7 +85,7 @@ void FRModelImproved::PrepareNodes()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
-	
+
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 15, repulsiveSsbo);
@@ -98,7 +98,7 @@ void FRModelImproved::PrepareEdges()
 {
 	glBindVertexArray(edgeVao);
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
-		
+
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
 
@@ -120,7 +120,7 @@ void FRModelImproved::PrepareEdges()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -139,16 +139,19 @@ void FRModelImproved::UpdateNodes()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 
 	// repulsivePositionCalc
+	// glUseProgram(repulsivePositionCalc->GetShaderProgram());
+	// glUseProgram(0);
+
 	glUseProgram(repulsivePositionCalc->GetShaderProgram());
+	glDispatchCompute((nodeSize / 128) + 1, 1, 1);
 	PassUniforms(repulsivePositionCalc->GetShaderProgram());
-	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	//repulsivePositionUpdate
-	glUseProgram(repulsivePositionUpdate->GetShaderProgram());
-	PassUniforms(repulsivePositionUpdate->GetShaderProgram());
-	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+	// //repulsivePositionUpdate
+	// glUseProgram(repulsivePositionUpdate->GetShaderProgram());
+	// PassUniforms(repulsivePositionUpdate->GetShaderProgram());
+	// glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
+	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
 	glUseProgram(attractiveCompute->GetShaderProgram());

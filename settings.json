@@ -11,7 +11,7 @@
     "blue": 0,
     "graphType3d": true,
     "showEdge": true,
-    "isUpdateOn": true,
+    "isUpdateOn": false,
     "nodeSizeRangeStart": 5,
     "nodeSizeRangeEnd": 10,
     "nodeShaderName": "nodes",

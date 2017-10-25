@@ -1,12 +1,11 @@
 #version 430
-layout (local_size_x = 10, local_size_y = 1, local_size_z = 1) in;
+
+layout (local_size_x = 128) in;
 
 float SPEED_DIVISOR = 800.0;
 float AREA_MULTIPLICATOR = 1000.0;
 
-layout( location = 11 ) uniform float speed = 100.0;
 layout( location = 12 ) uniform float area = 100.0;
-layout( location = 13 ) uniform float gravity = 10.0;
 
 struct GraphicData
 {
@@ -39,52 +38,65 @@ layout (std430, binding = 8) buffer DataConnections
 // 	vec4 repulsiveDistances[];
 // };
 
-// shared vec4 localPositions[ gl_WorkGroupSize.x ];
+shared vec4 cache[ gl_WorkGroupSize.x ];
 
 layout( location = 1 ) uniform int graphDataSize;
-layout( location = 9 ) uniform int connectionSize;
 
-void syncronize()
+void synchronize()
 {
 	memoryBarrierShared();
 	barrier();
+}
+float k;
+
+vec3 interaction(vec4 currentPosition, vec4 cachedPosition){
+    vec3 dist = currentPosition.xyz - cachedPosition.xyz;
+    float distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+    float repulsive = k / distSqrt;
+    
+    dist = dist / distSqrt * repulsive;
+
+    return dist;
 }
 
 void main(void)
 {
     uint globalIndex = gl_GlobalInvocationID.x;
+    int N = int(gl_NumWorkGroups.x*gl_WorkGroupSize.x);
+
     if(globalIndex > graphDataSize) return;
+
+    vec4 currentModelPosition = data[globalIndex].position;
     
-    float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
-    float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
+    k = ((AREA_MULTIPLICATOR * area) / (1.0 + N));
     k = k * k;
 
-    GraphicData currentModel = data[globalIndex];
+    vec3 t = vec3(0.0);
 
-    currentModel.dx = 0;
-    currentModel.dy = 0;
-    currentModel.dz = 0;
+    // for(uint tile = 0; tile < N; tile += gl_WorkGroupSize.x) {
+    //     cache[gl_LocalInvocationIndex] = data[tile + gl_LocalInvocationIndex].position;
+    //     groupMemoryBarrier();
+    //     barrier();
+    //     for(int i = 0;i<gl_WorkGroupSize.x;++i) {
+    //         t += interaction(currentModelPosition, cache[i]);            
+    //     }
+    //     groupMemoryBarrier();
+    //     barrier();
+    // }
+           
 
-
-    for (uint j = 0; j < graphDataSize; j++)
+    for (uint j = 0; j < N; j++)
     {
-        GraphicData model = data[j];
-        vec4 dist = currentModel.position - model.position;
-        float distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
-        float repulsive = k / distSqrt;
-
-        vec4 calculateddistances = vec4(dist.x, dist.y, dist.z, 0) ;
-        
-        calculateddistances = calculateddistances / distSqrt;
-        calculateddistances = calculateddistances * repulsive;
-
         if (globalIndex != j)
         {
-            currentModel.dx += calculateddistances.x; 
-            currentModel.dy += calculateddistances.y;
-            currentModel.dz += calculateddistances.z;
+            t += interaction(currentModelPosition, data[j].position);   
         }
-        }
+    }
+    
+    // synchronize();
 
-    data[globalIndex] = currentModel;
+    data[globalIndex].dx = t.x;
+    data[globalIndex].dy = t.y;
+    data[globalIndex].dz = t.z;
+
 }
