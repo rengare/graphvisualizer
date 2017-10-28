@@ -16,7 +16,6 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
 	this->repulsivePositionCalc = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_calc.comp");
-	this->repulsivePositionUpdate = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_update.comp");
 
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
@@ -138,20 +137,10 @@ void FRModelImproved::UpdateNodes()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 
-	// repulsivePositionCalc
-	// glUseProgram(repulsivePositionCalc->GetShaderProgram());
-	// glUseProgram(0);
-
 	glUseProgram(repulsivePositionCalc->GetShaderProgram());
-	glDispatchCompute((nodeSize / 128) + 1, 1, 1);
+	glDispatchCompute((nodeSize / 200) + 1, 1, 1);
 	PassUniforms(repulsivePositionCalc->GetShaderProgram());
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-	// //repulsivePositionUpdate
-	// glUseProgram(repulsivePositionUpdate->GetShaderProgram());
-	// PassUniforms(repulsivePositionUpdate->GetShaderProgram());
-	// glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
-	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
 	glUseProgram(attractiveCompute->GetShaderProgram());
@@ -283,7 +272,6 @@ void FRModelImproved::Clear()
 	edgeShader->Clear();
 
 	repulsivePositionCalc->Clear();
-	repulsivePositionUpdate->Clear();
 	attractiveCompute->Clear();
 	updateCompute->Clear();
 	linesCompute->Clear();
