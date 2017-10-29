@@ -137,9 +137,13 @@ void FRModelImproved::UpdateNodes()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 
+	//repulsive
 	glUseProgram(repulsivePositionCalc->GetShaderProgram());
-	glDispatchCompute((nodeSize / 200) + 1, 1, 1);
-	PassUniforms(repulsivePositionCalc->GetShaderProgram());
+	glDispatchCompute((nodeSize / 128) + 1, 1, 1);
+	glUniform1fv(12, 1, &area);
+	glUniform1iv(glGetUniformLocation(repulsivePositionCalc->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
+	
+	// PassUniforms(repulsivePositionCalc->GetShaderProgram());
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
@@ -154,7 +158,6 @@ void FRModelImproved::UpdateNodes()
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -169,7 +172,6 @@ void FRModelImproved::UpdateEdges()
 	glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
