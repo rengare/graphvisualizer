@@ -75,11 +75,13 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
-    if (graphModel != nullptr)
-    {
+    if (graphModel != nullptr && skip > 4)
+    {   
         graphModel->Update();
+        skip = 0;
     }
 
+    skip++;
     camera->Update();
 }
 

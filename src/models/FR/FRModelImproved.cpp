@@ -139,7 +139,7 @@ void FRModelImproved::UpdateNodes()
 
 	//repulsive
 	glUseProgram(repulsivePositionCalc->GetShaderProgram());
-	glDispatchCompute((nodeSize / 128) + 1, 1, 1);
+	glDispatchCompute((nodeSize / 100), 1, 1);
 	glUniform1fv(12, 1, &area);
 	glUniform1iv(glGetUniformLocation(repulsivePositionCalc->GetShaderProgram(), "graphDataSize"), 1, &nodeSize);
 	

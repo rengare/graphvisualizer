@@ -95,6 +95,7 @@ private:
   float area = 1000;
   float gravity = 10;
   int algorithmIndex = 3;
+  int skip = 0;
 };
 
 #endif
