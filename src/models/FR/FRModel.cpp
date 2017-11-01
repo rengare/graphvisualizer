@@ -1,6 +1,6 @@
 #include "FRModel.h"
 
-const int GROUP_SIZE = 10;
+const int GROUP_SIZE = 256;
 
 FRModel::FRModel()
 {

@@ -139,7 +139,7 @@ void FRModelImproved::UpdateNodes()
 
 	//repulsive
 	glUseProgram(repulsivePositionCalc->GetShaderProgram());
-	glDispatchCompute((nodeSize / 100), 1, 1);
+	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	PassUniforms(repulsivePositionCalc->GetShaderProgram());
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
