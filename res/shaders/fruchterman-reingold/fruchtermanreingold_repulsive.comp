@@ -56,7 +56,7 @@ void main(void)
     
     if(globalIndex > graphDataSize) return;
 
-    vec4 currentModelPosition = data[globalIndex].position;
+    GraphicData currentModel = data[globalIndex];
     
     k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
     k = k * k;
@@ -67,11 +67,12 @@ void main(void)
         
         if (globalIndex != j)
         {
-            t += repulsion(currentModelPosition, data[j].position, k);   
+            t += repulsion(currentModel.position, data[j].position, k);   
         }
     }
     
-    data[globalIndex].dx = t.x;
-    data[globalIndex].dy = t.y;
-    data[globalIndex].dz = t.z;
+    currentModel.dx = t.x;
+    currentModel.dy = t.y;
+    currentModel.dz = t.z;
+    data[globalIndex] = currentModel;
 }
