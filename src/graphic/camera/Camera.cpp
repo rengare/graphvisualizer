@@ -1,8 +1,8 @@
 #include "Camera.h"
 
-Camera::Camera(AppConfig &config, glm::vec3 position, glm::vec3 rotation, float farView, float nearView, float angle) : farView(farView),
-															nearView(nearView),
-															angle(angle)
+Camera::Camera(AppConfig &config, float farView, float nearView, float angle, glm::vec3 position, glm::vec3 rotation) : farView(farView),
+                                                                                                                        nearView(nearView),
+                                                                                                                        angle(angle)
 {
     this->width = config.width;
     this->height = config.height;
@@ -29,33 +29,33 @@ glm::mat4 Camera::GetProjectionMatrix()
 void Camera::Up()
 {
     Translate(
-	0,
-	-cameraVelocity.y,
-	0);
+        0,
+        -cameraVelocity.y,
+        0);
 }
 
 void Camera::Down()
 {
     Translate(
-	0,
-	cameraVelocity.y,
-	0);
+        0,
+        cameraVelocity.y,
+        0);
 }
 
 void Camera::Forward()
 {
     Translate(
-	cameraVelocity.x * glm::sin(glm::radians(-cameraRotation.y)),
-	cameraVelocity.y * sin(glm::radians(cameraRotation.x)),
-	cameraVelocity.z * glm::cos(glm::radians(-cameraRotation.y)));
+        cameraVelocity.x * glm::sin(glm::radians(-cameraRotation.y)),
+        cameraVelocity.y * sin(glm::radians(cameraRotation.x)),
+        cameraVelocity.z * glm::cos(glm::radians(-cameraRotation.y)));
 }
 
 void Camera::Back()
 {
     Translate(
-	-cameraVelocity.x * glm::sin(glm::radians(-cameraRotation.y)),
-	-cameraVelocity.y * sin(glm::radians(cameraRotation.x)),
-	-cameraVelocity.z * glm::cos(glm::radians(-cameraRotation.y)));
+        -cameraVelocity.x * glm::sin(glm::radians(-cameraRotation.y)),
+        -cameraVelocity.y * sin(glm::radians(cameraRotation.x)),
+        -cameraVelocity.z * glm::cos(glm::radians(-cameraRotation.y)));
 }
 
 void Camera::SetPosition(glm::vec3 pos)
@@ -93,17 +93,17 @@ glm::vec3 Camera::GetPosition()
 void Camera::Left()
 {
     Translate(
-	cameraVelocity.x * glm::cos(glm::radians(cameraRotation.y)),
-	0,
-	cameraVelocity.z * glm::sin(glm::radians(cameraRotation.y)));
+        cameraVelocity.x * glm::cos(glm::radians(cameraRotation.y)),
+        0,
+        cameraVelocity.z * glm::sin(glm::radians(cameraRotation.y)));
 }
 
 void Camera::Right()
 {
     Translate(
-	-cameraVelocity.x * glm::cos(glm::radians(cameraRotation.y)),
-	0,
-	-cameraVelocity.z * glm::sin(glm::radians(cameraRotation.y)));
+        -cameraVelocity.x * glm::cos(glm::radians(cameraRotation.y)),
+        0,
+        -cameraVelocity.z * glm::sin(glm::radians(cameraRotation.y)));
 }
 
 void Camera::RotateLeft()

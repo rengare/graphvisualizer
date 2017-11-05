@@ -7,6 +7,7 @@ float AREA_MULTIPLICATOR = 1000.0;
 layout( location = 11 ) uniform float speed = 100.0;
 layout( location = 12 ) uniform float area = 100.0;
 layout( location = 13 ) uniform float gravity = 10.0;
+layout( location = 17 ) uniform int graphType3d = 0;
 
 struct GraphicData
 {
@@ -37,10 +38,12 @@ layout (std430, binding = 8) buffer DataConnections
 layout( location = 1 ) uniform int graphDataSize;
 layout( location = 9 ) uniform int connectionSize;
 
-void syncronize()
-{
-	memoryBarrierShared();
-	barrier();
+float distSqrt(vec4 pos){
+    if(graphType3d == 1){
+        return sqrt((pos.x * pos.x + pos.y * pos.y + pos.z * pos.z));
+    }else{
+        return sqrt((pos.x * pos.x + pos.y * pos.y));
+    }
 }
 
 void main(void)
@@ -58,18 +61,25 @@ void main(void)
         float xDist = source.position[0] - target.position[0];
         float yDist = source.position[1] - target.position[1];
         float zDist = source.position[2] - target.position[2];
-        float dist = sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+
+        float dist = distSqrt(vec4(xDist, yDist, zDist, 0));
 
         if (dist > 0)
         {
             float atractive = (dist * dist) / k;
             source.dx -= xDist / dist * atractive;
             source.dy -= yDist / dist * atractive;
-            source.dz -= zDist / dist * atractive;
 
             target.dx += xDist / dist * atractive;
             target.dy += yDist / dist * atractive;
-            target.dz += zDist / dist * atractive;
+            
+            if(graphType3d == 1){
+                source.dz -= zDist / dist * atractive;
+                target.dz += zDist / dist * atractive;
+            }else{
+                source.dz = 0;
+                target.dz = 0;
+            }
 
             data[connections[globalIndex].from] = source;
             data[connections[globalIndex].to] = target;

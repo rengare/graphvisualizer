@@ -6,6 +6,7 @@ layout (local_size_x = GROUPSIZE) in;
 float AREA_MULTIPLICATOR = 1000.0;
 
 layout( location = 12 ) uniform float area = 100.0;
+layout( location = 17 ) uniform int graphType3d = 0;
 
 struct GraphicData
 {
@@ -41,6 +42,7 @@ vec3 distance(vec4 currentPosition, vec4 cachedPosition){
 
 vec3 repulsion(vec4 currentPosition, vec4 cachedPosition, float k){
     vec3 dist = distance(currentPosition, cachedPosition);
+    if(graphType3d == 0) dist.z = 0;
     float distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
     float repulsive = k / distSqrt;
     

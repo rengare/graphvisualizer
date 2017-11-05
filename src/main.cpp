@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
     }
 
     auto app = new App(config);
-    Camera *camera = new Camera(config);
-    camera->SetCameraVelocity(glm::vec3(10.f));
+    Camera *camera = new Camera(config, 200000.0);
+    camera->SetCameraVelocity(glm::vec3(100.f));
     camera->SetPosition(glm::vec3(0, 0, -700));
     app->AddCamera(camera);
 

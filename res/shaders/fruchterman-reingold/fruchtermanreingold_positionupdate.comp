@@ -7,6 +7,7 @@ float AREA_MULTIPLICATOR = 1000.0;
 layout( location = 11 ) uniform float speed = 100.0;
 layout( location = 12 ) uniform float area = 100.0;
 layout( location = 13 ) uniform float gravity = 10.0;
+layout( location = 17 ) uniform int graphType3d = 0;
 
 struct GraphicData
 {
@@ -39,10 +40,26 @@ layout( location = 9 ) uniform int connectionSize;
 
 shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
-void syncronize()
-{
-	memoryBarrierShared();
-	barrier();
+float distSqrt(vec4 pos){
+    if(graphType3d == 1){
+        return sqrt((pos.x * pos.x + pos.y * pos.y + pos.z * pos.z));
+    }else{
+        return sqrt((pos.x * pos.x + pos.y * pos.y));
+    }
+}
+
+vec4 positionUpdate(GraphicData model, float d, float limitedDist){
+    vec4 position = vec4(0);
+
+        position.x = model.position.x + model.dx / d * limitedDist;
+        position.y = model.position.y + model.dy / d * limitedDist;
+        if(graphType3d == 1){
+            position.z = model.position.z + model.dz / d * limitedDist;
+        }else{
+            position.z = 0;
+        }
+
+    return position;
 }
 
 void main(void)
@@ -56,26 +73,31 @@ void main(void)
     if(globalIndex > graphDataSize) return;
 
     GraphicData pos = data[globalIndex];
-    float d = sqrt((pos.position[0] * pos.position[0] + pos.position[1] * pos.position[1] + pos.position[2] * pos.position[2]));
+
+
+    float d = distSqrt(pos.position);
+        
     float gf = 0.01 * k * gravity * d;
 
     pos.dx -= gf * pos.position[0] / d;
-    pos.dy -= gf * pos.position[1] / d;
-    pos.dz -= gf * pos.position[2] / d;
-
     pos.dx += speed;
+    
+    pos.dy -= gf * pos.position[1] / d;
     pos.dy += speed;
-    pos.dz += speed;
+    
+    if(graphType3d == 1){
+        pos.dz -= gf * pos.position[2] / d;
+        pos.dz += speed;
+    }
 
-    d = sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
 
+    d = distSqrt(vec4(pos.dx, pos.dy, pos.dz, 0));
+    
     if (d > 0)
     {
         float limitedDist = min(maxDisplace * (speed / SPEED_DIVISOR), d);
-                        
-        pos.position[0] = pos.position[0] + pos.dx / d * limitedDist;
-        pos.position[1] = pos.position[1] + pos.dy / d * limitedDist;
-        pos.position[2] = pos.position[2] + pos.dz / d * limitedDist;
+        pos.position = positionUpdate(pos, d, limitedDist);         
     }
+
     data[globalIndex] = pos;
 }

@@ -117,6 +117,8 @@ void FRModel::PrepareEdges()
 
 void FRModel::Update()
 {
+	graphType = config->graphType3d;
+	
 	if (config->isUpdateOn)
 	{
 		UpdateNodes();
@@ -169,6 +171,7 @@ void FRModel::PassUniforms(GLuint shader)
 {
 	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
+	glUniform1iv(glGetUniformLocation(shader, "graphType3d"), 1, &graphType);
 
 	glUniform1fv(11, 1, &speed);
 	glUniform1fv(12, 1, &area);

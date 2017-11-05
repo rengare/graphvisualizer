@@ -16,7 +16,7 @@ struct AppConfig
     float green = 0.f;
     float blue = 0.f;
     float skip;
-    bool graphType3d;
+    bool graphType3d = false;
     bool showEdge = true;
     bool isUpdateOn = true;
     int nodeSizeRangeStart = 1;

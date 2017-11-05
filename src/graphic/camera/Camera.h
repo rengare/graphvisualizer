@@ -13,7 +13,7 @@
 class Camera
 {
 public:
-	Camera(AppConfig& config, glm::vec3 position = glm::vec3{ 0 }, glm::vec3 rotation = glm::vec3{ 0 }, float farView = 2000.0f, float nearView = 0.1f, float angle = 45.0f);
+	Camera(AppConfig& config,float farView = 2000.0f, float nearView = 0.1f, float angle = 45.0f, glm::vec3 position = glm::vec3{ 0 }, glm::vec3 rotation = glm::vec3{ 0 });
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjectionMatrix();
 
@@ -49,27 +49,28 @@ public:
 
 	glm::vec3 cameraPosition{ 0.f, 0.f, -20.f };
 	glm::vec3 cameraRotation{ 1.f };
-
+	
 private:
 	void ResetRotation();
 	void ResetPosition();
 	void Translate( float x, float y, float z );
-
-
+	
+	
 	int width;
 	int height;
-
+	
 	glm::mat4 projectionMatrix;
 	glm::mat4 viewMatrix;
-
+	
 	glm::mat4 translationMatrix;
 	glm::mat4 rotationMatrix;
-
+	
 	glm::vec3 cameraVelocity{ 0.5f };
 	glm::vec3 rotationVelocity{ 0.5f };
-
+	
 	float aspectRatio;
 	float rotationRatio = 1.f;
-	float angle = 45.0f, nearView = 0.1f, farView = 2000.0f;
+	float angle = 45.0f, nearView = 0.1f;
+	float farView = 2000.0f;
 };
 #endif // !CAMERA_H

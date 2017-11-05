@@ -36,21 +36,21 @@ void FRModelCpu::PrepareBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
 	glGenBuffers(1, &edgeSbo);
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSbo);
 	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &nodeVao);
-	glGenVertexArrays(1, &edgeVao);	
+	glGenVertexArrays(1, &edgeVao);
 }
 
 void FRModelCpu::PrepareNodes()
 {
 	glBindVertexArray(nodeVao);
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSbo);
-	
+
 	int positionLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_color");
 	int sizeLocation = glGetAttribLocation(nodeShader->GetShaderProgram(), "in_size");
@@ -67,7 +67,7 @@ void FRModelCpu::PrepareNodes()
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
@@ -88,7 +88,7 @@ void FRModelCpu::PrepareEdges()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
@@ -219,13 +219,24 @@ void FRModelCpu::FruchtermanReingold()
 				float xDist = (*bufferVertices)[i].vertexPosition.x - (*bufferVertices)[j].vertexPosition.x;
 				float yDist = (*bufferVertices)[i].vertexPosition.y - (*bufferVertices)[j].vertexPosition.y;
 				float zDist = (*bufferVertices)[i].vertexPosition.z - (*bufferVertices)[j].vertexPosition.z;
-				float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+				float dist = 0;
+
+				if (config->graphType3d)
+				{
+					dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+				}
+				else
+				{
+					dist = std::sqrt(xDist * xDist + yDist * yDist);
+				}
+
 				if (dist > 0)
 				{
 					float repulsive = (k * k) / dist;
 					(*bufferVertices)[i].dx += xDist / dist * repulsive;
 					(*bufferVertices)[i].dy += yDist / dist * repulsive;
-					(*bufferVertices)[i].dz += zDist / dist * repulsive;
+					if (config->graphType3d)
+						(*bufferVertices)[i].dz += zDist / dist * repulsive;
 				}
 			}
 		}
@@ -240,18 +251,31 @@ void FRModelCpu::FruchtermanReingold()
 		float xDist = source.vertexPosition.x - target.vertexPosition.x;
 		float yDist = source.vertexPosition.y - target.vertexPosition.y;
 		float zDist = source.vertexPosition.z - target.vertexPosition.z;
-		float dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+		float dist = 0;
+
+		if (config->graphType3d)
+		{
+			dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+		}
+		else
+		{
+			dist = std::sqrt(xDist * xDist + yDist * yDist);
+		}
 
 		if (dist > 0)
 		{
 			float atractive = (dist * dist) / k;
 			source.dx -= xDist / dist * atractive;
 			source.dy -= yDist / dist * atractive;
-			source.dz -= zDist / dist * atractive;
 
 			target.dx += xDist / dist * atractive;
 			target.dy += yDist / dist * atractive;
-			target.dz += zDist / dist * atractive;
+
+			if (config->graphType3d)
+			{
+				source.dz -= zDist / dist * atractive;
+				target.dz += zDist / dist * atractive;
+			}
 
 			(*bufferVertices)[(*fromToConnections)[i].from] = source;
 			(*bufferVertices)[(*fromToConnections)[i].to] = target;
@@ -261,7 +285,15 @@ void FRModelCpu::FruchtermanReingold()
 	for (int i = 0; i < nodeSize; i++)
 	{
 		auto pos = (*bufferVertices)[i];
-		float d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
+		float d = 0;
+		if (config->graphType3d)
+		{
+			d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
+		}
+		else
+		{
+			d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y));
+		}
 		float gf = 0.01f * k * (float)gravity * d;
 
 		pos.dx -= gf * pos.vertexPosition.x / d;
@@ -272,8 +304,15 @@ void FRModelCpu::FruchtermanReingold()
 		pos.dy += speed;
 		pos.dz += speed;
 
-		d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
-
+		if (config->graphType3d)
+		{
+			d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
+		}
+		else
+		{
+			d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy));
+		}
+		
 		if (d > 0)
 		{
 

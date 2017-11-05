@@ -75,5 +75,6 @@ private:
   float speed = 100.0;
   float area = 100.0;
   float gravity = 10.0;
+  int graphType = 0;
 };
 #endif
