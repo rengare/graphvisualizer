@@ -2,12 +2,12 @@
 layout (local_size_x = 256) in;
 
 float SPEED_DIVISOR = 800.0;
-float AREA_MULTIPLICATOR = 1000.0;
+float AREA_MULTIPLICATOR = 100;
 
-layout( location = 11 ) uniform float speed = 100.0;
-layout( location = 12 ) uniform float area = 100.0;
-layout( location = 13 ) uniform float gravity = 10.0;
-layout( location = 17 ) uniform int graphType3d = 0;
+layout( location = 11 ) uniform float speed;
+layout( location = 12 ) uniform float area;
+layout( location = 13 ) uniform float gravity;
+layout( location = 17 ) uniform int graphType3d;
 
 struct GraphicData
 {
@@ -85,11 +85,8 @@ void main(void)
     pos.dy -= gf * pos.position[1] / d;
     pos.dy += speed;
     
-    if(graphType3d == 1){
-        pos.dz -= gf * pos.position[2] / d;
-        pos.dz += speed;
-    }
-
+    pos.dz -= gf * pos.position[2] / d;
+    pos.dz += speed;
 
     d = distSqrt(vec4(pos.dx, pos.dy, pos.dz, 0));
     

@@ -41,7 +41,8 @@ void FRModel::PrepareBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
+
+
 	glGenBuffers(1, &fromToSsbo);
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
 	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
@@ -53,7 +54,7 @@ void FRModel::PrepareBuffers()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenVertexArrays(1, &nodeVao);
-	glGenVertexArrays(1, &edgeVao);	
+	glGenVertexArrays(1, &edgeVao);
 }
 
 void FRModel::PrepareNodes()
@@ -76,9 +77,10 @@ void FRModel::PrepareNodes()
 	glBindVertexArray(positionLocation);
 	glBindVertexArray(colorLocation);
 	glBindVertexArray(sizeLocation);
-	
+
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 15, repulsiveSsbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -88,7 +90,7 @@ void FRModel::PrepareEdges()
 {
 	glBindVertexArray(edgeVao);
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
-		
+
 	int positionLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_position");
 	int colorLocation = glGetAttribLocation(edgeShader->GetShaderProgram(), "in_color");
 
@@ -110,7 +112,7 @@ void FRModel::PrepareEdges()
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, edgeSsbo);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -118,7 +120,6 @@ void FRModel::PrepareEdges()
 void FRModel::Update()
 {
 	graphType = config->graphType3d;
-	
 	if (config->isUpdateOn)
 	{
 		UpdateNodes();
@@ -132,8 +133,8 @@ void FRModel::UpdateNodes()
 
 	//repulsive
 	glUseProgram(repulsiveCompute->GetShaderProgram());
-	PassUniforms(repulsiveCompute->GetShaderProgram());
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
+	PassUniforms(repulsiveCompute->GetShaderProgram());
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
@@ -148,7 +149,6 @@ void FRModel::UpdateNodes()
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -163,7 +163,6 @@ void FRModel::UpdateEdges()
 	glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -171,11 +170,11 @@ void FRModel::PassUniforms(GLuint shader)
 {
 	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
-	glUniform1iv(glGetUniformLocation(shader, "graphType3d"), 1, &graphType);
-
+	
 	glUniform1fv(11, 1, &speed);
 	glUniform1fv(12, 1, &area);
 	glUniform1fv(13, 1, &gravity);
+	glUniform1iv(17, 1, &graphType);
 }
 
 void FRModel::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
@@ -258,6 +257,7 @@ void FRModel::Clear()
 	glDeleteBuffers(1, &nodeSsbo);
 	glDeleteBuffers(1, &edgeSsbo);
 	glDeleteBuffers(1, &fromToSsbo);
+	glDeleteBuffers(1, &repulsiveSsbo);
 
 	glDeleteVertexArrays(1, &nodeVao);
 	glDeleteVertexArrays(1, &edgeVao);

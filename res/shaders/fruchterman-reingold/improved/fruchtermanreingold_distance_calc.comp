@@ -3,10 +3,12 @@
 
 layout (local_size_x = GROUPSIZE) in;
 
-float AREA_MULTIPLICATOR = 1000.0;
+float AREA_MULTIPLICATOR = 100;
 
-layout( location = 12 ) uniform float area = 100.0;
-layout( location = 17 ) uniform int graphType3d = 0;
+layout( location = 11 ) uniform float speed;
+layout( location = 12 ) uniform float area;
+layout( location = 13 ) uniform float gravity;
+layout( location = 17 ) uniform int graphType3d;
 
 struct GraphicData
 {

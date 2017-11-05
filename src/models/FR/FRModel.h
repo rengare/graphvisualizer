@@ -55,7 +55,7 @@ private:
 
   GLuint nodeVao;
   GLuint nodeSsbo;
-  GLuint fromToSsbo;
+  GLuint fromToSsbo, repulsiveSsbo;
 
   GLuint edgeVao;
   GLuint edgeSsbo;
