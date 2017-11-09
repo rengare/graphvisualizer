@@ -1,8 +1,8 @@
 #version 430
 layout (local_size_x = 256) in;
 
-float SPEED_DIVISOR = 800.0;
-float AREA_MULTIPLICATOR = 100;
+float SPEED_DIVISOR = 400.0;
+float AREA_MULTIPLICATOR = 500;
 
 layout( location = 11 ) uniform float speed;
 layout( location = 12 ) uniform float area;
@@ -79,21 +79,21 @@ void main(void)
         
     float gf = 0.01 * k * gravity * d;
 
-    pos.dx -= gf * pos.position[0] / d;
-    pos.dx += speed;
+    pos.dx -= gf * pos.position.x / d;
+    pos.dy -= gf * pos.position.y / d;
+    pos.dz -= gf * pos.position.z / d;
     
-    pos.dy -= gf * pos.position[1] / d;
-    pos.dy += speed;
+    pos.dx *= speed / SPEED_DIVISOR;
+    pos.dy *= speed / SPEED_DIVISOR;
+    pos.dz *= speed / SPEED_DIVISOR;
     
-    pos.dz -= gf * pos.position[2] / d;
-    pos.dz += speed;
 
     d = distSqrt(vec4(pos.dx, pos.dy, pos.dz, 0));
     
     if (d > 0)
     {
         float limitedDist = min(maxDisplace * (speed / SPEED_DIVISOR), d);
-        pos.position = positionUpdate(pos, d, limitedDist);         
+        pos.position = positionUpdate(pos, d, limitedDist);
     }
 
     data[globalIndex] = pos;

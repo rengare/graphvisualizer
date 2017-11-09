@@ -76,7 +76,7 @@ void App::Update()
     // Fruchterman_Reingold();
 
     if (graphModel != nullptr && skip > 2)
-    {   
+    {
         graphModel->Update();
         skip = 0;
     }
@@ -250,9 +250,14 @@ void App::SetAppState(AppState state)
     this->appState = state;
 }
 
-void App::SetNodesCount(int count)
+void App::SetNodesSize(int count)
 {
     nodeCount = count;
+}
+
+void App::SetEdgesSize(int count)
+{
+    edgeCount = count;
 }
 
 void App::RenderGui()
@@ -262,8 +267,10 @@ void App::RenderGui()
     if (config.showGui)
     {
 
-        string nodesText = "nodes count: " + to_string(nodeCount);
-        ImGui::Text(nodesText.c_str());
+        string nodeSizeText = "nodes count: " + to_string(nodeCount);
+        string edgeSizeText = "edges count: " + to_string(edgeCount);
+        ImGui::Text(nodeSizeText.c_str());
+        ImGui::Text(edgeSizeText.c_str());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
 
@@ -297,24 +304,27 @@ void App::RenderGui()
     {
         ImGui::Checkbox("Show edge", &config.showEdge);
         ImGui::Checkbox("Update", &config.isUpdateOn);
+        ImGui::Checkbox("3d", &config.graphType3d);
 
         if (ImGui::RadioButton("F-R gpu improved", &algorithmIndex, 3))
         {
             CreateModel(algorithmIndex);
         }
         ImGui::SameLine();
-        
+
         if (ImGui::RadioButton("F-R gpu", &algorithmIndex, 0))
         {
             CreateModel(algorithmIndex);
         }
         ImGui::SameLine();
 
-        if(ImGui::RadioButton("F-R cpu", &algorithmIndex, 1)){
+        if (ImGui::RadioButton("F-R cpu", &algorithmIndex, 1))
+        {
             CreateModel(algorithmIndex);
         };
-        
-        if(ImGui::RadioButton("Random gpu", &algorithmIndex, 2)){
+
+        if (ImGui::RadioButton("Random gpu", &algorithmIndex, 2))
+        {
             CreateModel(algorithmIndex);
         };
     }
@@ -331,7 +341,8 @@ void App::RenderGui()
 
 void App::CreateModel(int algorithmIndex)
 {
-    if(graphModel != nullptr){
+    if (graphModel != nullptr)
+    {
         graphModel->Clear();
         graphModel = nullptr;
     }

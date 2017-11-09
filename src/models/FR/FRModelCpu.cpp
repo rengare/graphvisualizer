@@ -212,6 +212,10 @@ void FRModelCpu::FruchtermanReingold()
 		(*bufferVertices)[i].dy = 0;
 		(*bufferVertices)[i].dz = 0;
 
+		if(config->graphType3d && (*bufferVertices)[i].vertexPosition.z == 0.0){
+			(*bufferVertices)[i].vertexPosition.z = 1;
+		}
+
 		for (int j = 0; j < nodeSize; j++)
 		{
 			if (i != j)
@@ -228,6 +232,7 @@ void FRModelCpu::FruchtermanReingold()
 				else
 				{
 					dist = std::sqrt(xDist * xDist + yDist * yDist);
+
 				}
 
 				if (dist > 0)
@@ -300,9 +305,9 @@ void FRModelCpu::FruchtermanReingold()
 		pos.dy -= gf * pos.vertexPosition.y / d;
 		pos.dz -= gf * pos.vertexPosition.z / d;
 
-		pos.dx += speed;
-		pos.dy += speed;
-		pos.dz += speed;
+		pos.dx *= speed / SPEED_DIVISOR;
+		pos.dy *= speed / SPEED_DIVISOR;
+		pos.dz *= speed / SPEED_DIVISOR;
 
 		if (config->graphType3d)
 		{
@@ -327,6 +332,8 @@ void FRModelCpu::FruchtermanReingold()
 			if (config->graphType3d)
 			{
 				pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
+			}else{
+				pos.vertexPosition.z = 0;
 			}
 		}
 		(*bufferVertices)[i] = pos;

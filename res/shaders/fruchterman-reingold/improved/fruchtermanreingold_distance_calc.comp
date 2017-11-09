@@ -3,7 +3,7 @@
 
 layout (local_size_x = GROUPSIZE) in;
 
-float AREA_MULTIPLICATOR = 100;
+float AREA_MULTIPLICATOR = 500;
 
 layout( location = 11 ) uniform float speed;
 layout( location = 12 ) uniform float area;

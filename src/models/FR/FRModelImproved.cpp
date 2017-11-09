@@ -15,8 +15,7 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
-	this->repulsivePositionCalc = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_calc.comp");
-
+	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
 	this->linesCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_lines.comp");
@@ -29,8 +28,6 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	nodeSize = (*bufferVertices).size();
 	edgeSize = (*edgeVertices).size();
 	fromToConnectionSize = (*fromToConnections).size();
-
-	repulsivePositions = new vector<glm::vec4>(nodeSize);
 
 	PrepareBuffers();
 
@@ -45,10 +42,6 @@ void FRModelImproved::PrepareBuffers()
 	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glGenBuffers(1, &repulsiveSsbo);
-	glBindBuffer(GL_ARRAY_BUFFER, repulsiveSsbo);
-	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(glm::vec4), &(*repulsivePositions)[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glGenBuffers(1, &fromToSsbo);
 	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
@@ -126,6 +119,8 @@ void FRModelImproved::PrepareEdges()
 
 void FRModelImproved::Update()
 {
+	graphType = config->graphType3d;
+	
 	if (config->isUpdateOn)
 	{
 		UpdateNodes();
@@ -138,9 +133,9 @@ void FRModelImproved::UpdateNodes()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 
 	//repulsive
-	glUseProgram(repulsivePositionCalc->GetShaderProgram());
+	glUseProgram(repulsiveCompute->GetShaderProgram());
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
-	PassUniforms(repulsivePositionCalc->GetShaderProgram());
+	PassUniforms(repulsiveCompute->GetShaderProgram());
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	//attractive
@@ -176,10 +171,11 @@ void FRModelImproved::PassUniforms(GLuint shader)
 {
 	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
-
+	
 	glUniform1fv(11, 1, &speed);
 	glUniform1fv(12, 1, &area);
 	glUniform1fv(13, 1, &gravity);
+	glUniform1iv(17, 1, &graphType);
 }
 
 void FRModelImproved::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
@@ -270,7 +266,7 @@ void FRModelImproved::Clear()
 	nodeShader->Clear();
 	edgeShader->Clear();
 
-	repulsivePositionCalc->Clear();
+	repulsiveCompute->Clear();
 	attractiveCompute->Clear();
 	updateCompute->Clear();
 	linesCompute->Clear();

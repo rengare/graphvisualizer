@@ -53,7 +53,8 @@ public:
 
   void AddCamera(Camera *camera);
   void SetAppState(AppState state);
-  void SetNodesCount(int count);
+  void SetNodesSize(int count);
+  void SetEdgesSize(int edgeCount);
 
   IModel *graphModel = nullptr;
   ModelData* modelData = nullptr;
@@ -84,6 +85,7 @@ private:
   glm::mat4 viewMatrix;
 
   int nodeCount;
+  int edgeCount;
   int nodeIndex = 0;
 
   int currentNodeIteration = 0;

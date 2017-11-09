@@ -1,5 +1,5 @@
-#ifndef FR_MODEL_IMPROVED
-#define FR_MODEL_IMPROVED
+#ifndef FR_IMPROVED_MODEL
+#define FR_IMPROVED_MODEL
 
 #include <iostream>
 #include <vector>
@@ -52,21 +52,17 @@ private:
   vector<VertexData> *bufferVertices;
   vector<VertexData> *edgeVertices;
   vector<ConnectionIndices> *fromToConnections;
-  vector<glm::vec4> *repulsivePositions;
 
   GLuint nodeVao;
   GLuint nodeSsbo;
-  GLuint repulsiveSsbo;
-  GLuint fromToSsbo;
+  GLuint fromToSsbo, repulsiveSsbo;
 
   GLuint edgeVao;
   GLuint edgeSsbo;
 
   Shader *nodeShader, *edgeShader;
 
-  ComputeShader *repulsivePositionCalc;
-  ComputeShader *repulsivePositionUpdate;
-
+  ComputeShader *repulsiveCompute;
   ComputeShader *attractiveCompute;
   ComputeShader *updateCompute;
   ComputeShader *linesCompute;
@@ -79,5 +75,6 @@ private:
   float speed = 100.0;
   float area = 100.0;
   float gravity = 10.0;
+  int graphType = 0;
 };
 #endif

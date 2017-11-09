@@ -3,7 +3,7 @@
 
 layout (local_size_x = GROUPSIZE) in;
 
-float AREA_MULTIPLICATOR = 100;
+float AREA_MULTIPLICATOR = 500;
 
 layout( location = 11 ) uniform float speed;
 layout( location = 12 ) uniform float area;
@@ -76,6 +76,10 @@ void main(void)
     currentModel.dz = 0;
 
     k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
+
+    if(graphType3d == 1 && currentModel.position.z == 0.0){
+        currentModel.position.z = 1;
+    }
 
     vec3 t = vec3(0.0);
     for (uint j = 0; j < graphDataSize; j++)

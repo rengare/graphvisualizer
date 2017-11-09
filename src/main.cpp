@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
 
     std::cout << edgeData.size() << endl;
 
-    app->SetNodesCount((int)uniqueEdge.size());
+    app->SetNodesSize((int)uniqueEdge.size());
+    app->SetEdgesSize((int)edgeData.size());
 
     app->modelData = new ModelData(&nodeData, &edgeData, &fromToConnectionIndex);
 

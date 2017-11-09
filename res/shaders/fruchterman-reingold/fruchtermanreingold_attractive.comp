@@ -1,8 +1,8 @@
 #version 430
 layout (local_size_x = 256) in;
 
-float SPEED_DIVISOR = 800.0;
-float AREA_MULTIPLICATOR = 100;
+float SPEED_DIVISOR = 400.0;
+float AREA_MULTIPLICATOR = 500;
 
 layout( location = 11 ) uniform float speed;
 layout( location = 12 ) uniform float area;
@@ -58,9 +58,9 @@ void main(void)
         GraphicData source = data[connections[globalIndex].from];
         GraphicData target = data[connections[globalIndex].to];
 
-        float xDist = source.position[0] - target.position[0];
-        float yDist = source.position[1] - target.position[1];
-        float zDist = source.position[2] - target.position[2];
+        float xDist = source.position.x - target.position.x;
+        float yDist = source.position.y - target.position.y;
+        float zDist = source.position.z - target.position.z;
 
         float dist = distSqrt(vec4(xDist, yDist, zDist, 0));
 
