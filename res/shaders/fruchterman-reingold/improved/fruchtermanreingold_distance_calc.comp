@@ -47,10 +47,10 @@ vec3 repulsion(vec4 currentPosition, vec4 cachedPosition, float k){
     float distSqrt = 0;
     if(graphType3d == 1.0){
         dist = currentPosition.xyz - cachedPosition.xyz;
-        distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+        distSqrt = sqrt(pow(dist.x, 2) + pow(dist.y, 2) + pow(dist.z, 2));
     }else{
         dist = vec3(currentPosition.xy,0) - vec3(cachedPosition.xy,0);        
-        distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y);        
+        distSqrt = sqrt(pow(dist.x, 2) + pow(dist.y, 2));        
     }
     if(distSqrt > 0){
         float repulsive = k / distSqrt;
@@ -60,6 +60,8 @@ vec3 repulsion(vec4 currentPosition, vec4 cachedPosition, float k){
     }
     
 }
+
+shared vec4 cache[gl_WorkGroupSize.x];
 
 void main(void)
 {
@@ -77,13 +79,20 @@ void main(void)
 
     k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
 
+    if(graphType3d == 1 && currentModel.position.z == 0.0){
+        currentModel.position.z = 1;
+    }
+
     vec3 t = vec3(0.0);
-    for (uint j = 0; j < graphDataSize; j++)
+    for (uint j = 0; j < gl_NumWorkGroups.x * gl_WorkGroupSize.x; j += gl_WorkGroupSize.x)
     {
+        if(gl_LocalInvocationIndex + j >= graphDataSize) break;
+
+        cache[gl_LocalInvocationIndex] = data[gl_LocalInvocationIndex + j].position;
         
-        if (globalIndex != j)
-        {
-            t += repulsion(currentModel.position, data[j].position, k*k);   
+        for(uint i = 0; i< gl_WorkGroupSize.x; i++){
+            t += repulsion(currentModel.position, cache[i], k*k);   
+
         }
     }
     

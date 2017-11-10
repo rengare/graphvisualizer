@@ -15,7 +15,7 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
 
-	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
+	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/improved/fruchtermanreingold_distance_calc.comp");
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
 	this->linesCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_lines.comp");
@@ -38,20 +38,20 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 void FRModelImproved::PrepareBuffers()
 {
 	glGenBuffers(1, &nodeSsbo);
-	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 
 	glGenBuffers(1, &fromToSsbo);
-	glBindBuffer(GL_ARRAY_BUFFER, fromToSsbo);
-	glBufferData(GL_ARRAY_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, fromToSsbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, fromToConnectionSize * sizeof(ConnectionIndices), &(*fromToConnections)[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenBuffers(1, &edgeSsbo);
-	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
-	glBufferData(GL_ARRAY_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, edgeSize * sizeof(VertexData), &(*edgeVertices)[0], GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
 	glGenVertexArrays(1, &nodeVao);
 	glGenVertexArrays(1, &edgeVao);
@@ -131,7 +131,9 @@ void FRModelImproved::Update()
 void FRModelImproved::UpdateNodes()
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
-
+	// glBufferData(GL_SHADER_STORAGE_BUFFER, nodeSize * sizeof(VertexData), &(*bufferVertices)[0], GL_DYNAMIC_DRAW);
+	
+	
 	//repulsive
 	glUseProgram(repulsiveCompute->GetShaderProgram());
 	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);

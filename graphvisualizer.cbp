@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="graphvisualizer"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/ren/workspace/cpp/graphvisualizer"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/ren/workspace/cpp/graphvisualizer"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/ren/workspace/cpp/graphvisualizer"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="graphvisualizer">
+				<Option output="/home/ren/workspace/cpp/graphvisualizer/build/linux/graphvisualizer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ren/workspace/cpp/graphvisualizer/build/linux"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/glm/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/glad/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/sdl2/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/json/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 graphvisualizer"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="graphvisualizer/fast">
+				<Option output="/home/ren/workspace/cpp/graphvisualizer/build/linux/graphvisualizer" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/ren/workspace/cpp/graphvisualizer/build/linux"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/glm/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/glad/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/sdl2/include"/>
+					<Add directory="/home/ren/workspace/cpp/graphvisualizer/external/json/include"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 graphvisualizer/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/ren/workspace/cpp/graphvisualizer/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/config/AppConfig.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/glad.c">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/ComputeShader.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/ComputeShader.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/Renderer.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/Renderer.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/SettingsOpengl.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/SettingsOpengl.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/SettingsSDL.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/SettingsSDL.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/Shader.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/Shader.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/camera/Camera.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/graphic/camera/Camera.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/FileHelper.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/Logger.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/ModelCreator.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/RandomNumberGenerator.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imconfig.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui_demo.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui_draw.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui_impl_sdl_gl3.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui_impl_sdl_gl3.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imgui_internal.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/stb_rect_pack.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/stb_textedit.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/stb_truetype.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/main.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModel.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModel.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModelCpu.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModelCpu.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModelImproved.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/FR/FRModelImproved.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/ForceAtlas/ForceAtlasModel.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/ForceAtlas/ForceAtlasModel.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/IModel.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/random/RandomModel.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/models/random/RandomModel.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/system/App.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/system/App.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/system/input/InputManager.cpp">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/system/input/InputManager.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

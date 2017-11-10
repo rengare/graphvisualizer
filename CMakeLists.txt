@@ -23,7 +23,6 @@ set(SOURCE_FILES
         src/imgui/imgui_impl_sdl_gl3.cpp
         src/imgui/imgui_impl_sdl_gl3.h
 #end imgui
-
         src/glad.c
         src/system/input/InputManager.cpp src/system/input/InputManager.h
 
