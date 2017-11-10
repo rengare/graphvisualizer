@@ -40,9 +40,9 @@ layout( location = 9 ) uniform int connectionSize;
 
 float distSqrt(vec4 pos){
     if(graphType3d == 1){
-        return sqrt((pos.x * pos.x + pos.y * pos.y + pos.z * pos.z));
+        return sqrt((pow(pos.x, 2) + pow(pos.y, 2) + pow(pos.z, 2)));
     }else{
-        return sqrt((pos.x * pos.x + pos.y * pos.y));
+        return sqrt((pow(pos.x, 2) + pow(pos.y, 2)));
     }
 }
 

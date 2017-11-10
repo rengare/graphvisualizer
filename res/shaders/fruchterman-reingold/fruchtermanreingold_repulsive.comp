@@ -47,10 +47,10 @@ vec3 repulsion(vec4 currentPosition, vec4 cachedPosition, float k){
     float distSqrt = 0;
     if(graphType3d == 1.0){
         dist = currentPosition.xyz - cachedPosition.xyz;
-        distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y + dist.z * dist.z);
+        distSqrt = sqrt(pow(dist.x, 2) + pow(dist.y, 2) + pow(dist.z, 2));
     }else{
         dist = vec3(currentPosition.xy,0) - vec3(cachedPosition.xy,0);        
-        distSqrt = sqrt(dist.x * dist.x + dist.y * dist.y);        
+        distSqrt = sqrt(pow(dist.x, 2) + pow(dist.y, 2));        
     }
     if(distSqrt > 0){
         float repulsive = k / distSqrt;
