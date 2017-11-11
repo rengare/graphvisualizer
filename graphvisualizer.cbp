@@ -146,6 +146,9 @@
 		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/RandomNumberGenerator.h">
 			<Option target="graphvisualizer"/>
 		</Unit>
+		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/helper/nanoflann.h">
+			<Option target="graphvisualizer"/>
+		</Unit>
 		<Unit filename="/home/ren/workspace/cpp/graphvisualizer/src/imgui/imconfig.h">
 			<Option target="graphvisualizer"/>
 		</Unit>

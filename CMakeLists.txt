@@ -29,6 +29,7 @@ set(SOURCE_FILES
         src/graphic/SettingsSDL.cpp src/graphic/SettingsSDL.h
         src/graphic/SettingsOpengl.cpp src/graphic/SettingsOpengl.h
         src/helper/RandomNumberGenerator.h
+        src/helper/nanoflann.h
         src/helper/ModelCreator.h
         src/config/AppConfig.h
         src/helper/FileHelper.h

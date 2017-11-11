@@ -90,11 +90,11 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
-        nodeData[i].vertexPosition.x = RandomNumberGenerator(-100, 100) / 1.0f;
-        nodeData[i].vertexPosition.y = RandomNumberGenerator(-100, 100) / 1.0f;
+        nodeData[i].vertexPosition.x = RandomNumberGenerator(-1000, 1000);
+        nodeData[i].vertexPosition.y = RandomNumberGenerator(-1000, 1000);
         if (config.graphType3d)
         {
-            nodeData[i].vertexPosition.z = RandomNumberGenerator(-100, 100) / 1.0f;
+            nodeData[i].vertexPosition.z = RandomNumberGenerator(-1000, 1000);
         }
         else
         {
