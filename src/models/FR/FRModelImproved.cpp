@@ -142,59 +142,57 @@ void FRModelImproved::UpdateNodes()
 
 	float k = (float)std::sqrt((500 * area) / (1.f + nodeSize));
 
-	// for (int i = 0; i < nodeSize; i++)
-	// {
-	// 	pc.pts[i].dx = 0;
-	// 	pc.pts[i].dy = 0;
-	// 	pc.pts[i].dz = 0;
+	for (int i = 0; i < nodeSize; i++)
+	{
+		pc.pts[i].dx = 0;
+		pc.pts[i].dy = 0;
+		pc.pts[i].dz = 0;
 
-	// 	if (config->graphType3d && pc.pts[i].vertexPosition.z == 0.0)
-	// 	{
-	// 		pc.pts[i].vertexPosition.z = 1;
-	// 	}
+		if (config->graphType3d && pc.pts[i].vertexPosition.z == 0.0)
+		{
+			pc.pts[i].vertexPosition.z = 1;
+		}
 
-	// 	// for (int j = i + 1; j < nodeSize; j++)
-	// 	// {
-	// 	// 	if (i != j)
-	// 	// 	{
-	// 	// 		float xDist = pc.pts[i].vertexPosition.x - pc.pts[j].vertexPosition.x;
-	// 	// 		float yDist = pc.pts[i].vertexPosition.y - pc.pts[j].vertexPosition.y;
-	// 	// 		float zDist = pc.pts[i].vertexPosition.z - pc.pts[j].vertexPosition.z;
-	// 	// 		float dist = 0;
+		float query_pt[3] = {pc.pts[i].vertexPosition.x, pc.pts[i].vertexPosition.y, pc.pts[i].vertexPosition.z};
 
-	// 	// 		if (config->graphType3d)
-	// 	// 		{
-	// 	// 			dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-	// 	// 		}
-	// 	// 		else
-	// 	// 		{
-	// 	// 			dist = std::sqrt(xDist * xDist + yDist * yDist);
-	// 	// 		}
+		{
+			size_t num_results = 25;
+			std::vector<size_t> ret_index(num_results);
+			std::vector<float> out_dist_sqr(num_results);
 
-	// 	// 		if (dist > 0)
-	// 	// 		{
-	// 	// 			float repulsive = (k * k) / dist;
-	// 	// 			pc.pts[i].dx += xDist / dist * repulsive;
-	// 	// 			pc.pts[i].dy += yDist / dist * repulsive;
-	// 	// 			if (config->graphType3d)
-	// 	// 				pc.pts[i].dz += zDist / dist * repulsive;
-	// 	// 		}
-	// 	// 	}
-	// 	// }
+			num_results = index->knnSearch(&query_pt[0], num_results, &ret_index[0], &out_dist_sqr[0]);
 
-	// 	// pc.pts[i].vertexPosition.x += 10;
-	// 	// float query_pt[3] = {pc.pts[i].vertexPosition.x, pc.pts[i].vertexPosition.y, pc.pts[i].vertexPosition.z};
-	// 	// {
-	// 	// 	const float search_radius = 150;
-	// 	// 	std::vector<std::pair<size_t, float>> ret_matches;
+			// In case of less points in the tree than requested:
+			ret_index.resize(num_results);
+			// out_dist_sqr.resize(num_results);
+			for (int j = 0; j < num_results; j++)
+			{
 
-	// 	// 	nanoflann::SearchParams params;
-	// 	// 	//params.sorted = false;
+				float xDist = pc.pts[i].vertexPosition.x - pc.pts[ret_index[j]].vertexPosition.x;
+				float yDist = pc.pts[i].vertexPosition.y - pc.pts[ret_index[j]].vertexPosition.y;
+				float zDist = pc.pts[i].vertexPosition.z - pc.pts[ret_index[j]].vertexPosition.z;
+				float dist = 0;
 
-	// 	// 	// const size_t nMatches = index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
-	// 	// 	int t = 0;
-	// 	// }
-	// }
+				if (config->graphType3d)
+				{
+					dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+				}
+				else
+				{
+					dist = std::sqrt(xDist * xDist + yDist * yDist);
+				}
+
+				if (dist > 0)
+				{
+					float repulsive = (k * k) / dist;
+					pc.pts[i].dx += xDist / dist * repulsive;
+					pc.pts[i].dy += yDist / dist * repulsive;
+					if (config->graphType3d)
+						pc.pts[i].dz += zDist / dist * repulsive;
+				}
+			}
+		}
+	}
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, nodeSize * sizeof(VertexData), &pc.pts[0], GL_DYNAMIC_DRAW);
