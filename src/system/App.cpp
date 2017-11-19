@@ -75,7 +75,7 @@ void App::Update()
     ProcessInput();
     // Fruchterman_Reingold();
 
-    if (graphModel != nullptr && skip > 2)
+    if (graphModel != nullptr && skip > 1)
     {
         graphModel->Update();
         skip = 0;
@@ -89,10 +89,6 @@ void App::Draw()
 {
     renderer->BeginDraw();
     auto cameraPos = camera->GetPosition();
-
-    // edges.isVisible = config.showEdge;
-    // nodes.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
-    // edges.Draw(camera->GetProjectionMatrix(), camera->GetViewMatrix(), cameraPos);
 
     if (graphModel != nullptr)
     {
@@ -303,20 +299,22 @@ void App::RenderGui()
     ImGui::Begin("Algorithms");
     {
         ImGui::Checkbox("Show edge", &config.showEdge);
-        ImGui::Checkbox("Update", &config.isUpdateOn);
-        ImGui::Checkbox("3d", &config.graphType3d);
-
-        if (ImGui::RadioButton("F-R gpu improved", &algorithmIndex, 3))
-        {
-            CreateModel(algorithmIndex);
-        }
         ImGui::SameLine();
+
+        ImGui::Checkbox("Update", &config.isUpdateOn);
+        ImGui::SameLine();
+
+        ImGui::Checkbox("3d", &config.graphType3d);
 
         if (ImGui::RadioButton("F-R gpu", &algorithmIndex, 0))
         {
             CreateModel(algorithmIndex);
         }
-        ImGui::SameLine();
+
+        if (ImGui::RadioButton("F-R cpu kd-tree", &algorithmIndex, 3))
+        {
+            CreateModel(algorithmIndex);
+        }
 
         if (ImGui::RadioButton("F-R cpu", &algorithmIndex, 1))
         {

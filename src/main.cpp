@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
     int hostArrayIndex = 0;
 
-    int range = 100;
+    int range = 1000;
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
         nodeData[i].vertexPosition.x = RandomNumberGenerator(-range, range);

@@ -91,12 +91,7 @@ private:
   int currentNodeIteration = 0;
   int currentEdgeIteration = 0;
 
-  float SPEED_DIVISOR = 800;
-  float AREA_MULTIPLICATOR = 10000;
-  float speed = 1;
-  float area = 1000;
-  float gravity = 10;
-  int algorithmIndex = 3;
+  int algorithmIndex = 0;
   int skip = 0;
 };
 

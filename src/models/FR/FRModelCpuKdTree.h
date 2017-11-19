@@ -1,5 +1,5 @@
-#ifndef FR_IMPROVED_MODEL
-#define FR_IMPROVED_MODEL
+#ifndef FR_CPU_KDTREE_MODEL
+#define FR_CPU_KDTREE_MODEL
 
 #include <iostream>
 #include <vector>
@@ -69,12 +69,12 @@ struct PointCloudAdaptor
 
 }; // end of PointCloudAdaptor
 
-class FRModelImproved : public IModel
+class FRModelCpuKdTree : public IModel
 {
 public:
-  FRModelImproved();
-  ~FRModelImproved();
-  FRModelImproved(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
+  FRModelCpuKdTree();
+  ~FRModelCpuKdTree();
+  FRModelCpuKdTree(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections);
 
   void Update() override;
 

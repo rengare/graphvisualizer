@@ -1,16 +1,19 @@
-#include "FRModelImproved.h"
+#include "FRModelCpuKdTree.h"
 
 const int GROUP_SIZE = 256;
+const float AREA_MULTIPLICATOR = 500;
+const float SPEED_DIVISOR = 800;
+const float NEIGHBOR_FORCE_MULTIPLICATOR = 10;
 
-FRModelImproved::FRModelImproved()
+FRModelCpuKdTree::FRModelCpuKdTree()
 {
 }
 
-FRModelImproved::~FRModelImproved()
+FRModelCpuKdTree::~FRModelCpuKdTree()
 {
 }
 
-FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
+FRModelCpuKdTree::FRModelCpuKdTree(AppConfig *config, vector<VertexData> *nodeData, vector<VertexData> *edgeData, vector<ConnectionIndices> *fromToConnections)
 {
 	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
@@ -40,7 +43,7 @@ FRModelImproved::FRModelImproved(AppConfig *config, vector<VertexData> *nodeData
 	PrepareNodes();
 }
 
-void FRModelImproved::PrepareBuffers()
+void FRModelCpuKdTree::PrepareBuffers()
 {
 	glGenBuffers(1, &nodeSsbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
@@ -61,7 +64,7 @@ void FRModelImproved::PrepareBuffers()
 	glGenVertexArrays(1, &edgeVao);
 }
 
-void FRModelImproved::PrepareNodes()
+void FRModelCpuKdTree::PrepareNodes()
 {
 	glBindVertexArray(nodeVao);
 	glBindBuffer(GL_ARRAY_BUFFER, nodeSsbo);
@@ -90,7 +93,7 @@ void FRModelImproved::PrepareNodes()
 	glBindVertexArray(0);
 }
 
-void FRModelImproved::PrepareEdges()
+void FRModelCpuKdTree::PrepareEdges()
 {
 	glBindVertexArray(edgeVao);
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
@@ -121,7 +124,7 @@ void FRModelImproved::PrepareEdges()
 	glBindVertexArray(0);
 }
 
-void FRModelImproved::Update()
+void FRModelCpuKdTree::Update()
 {
 	graphType = config->graphType3d;
 
@@ -132,15 +135,17 @@ void FRModelImproved::Update()
 	};
 }
 
-void FRModelImproved::UpdateNodes()
+void FRModelCpuKdTree::UpdateNodes()
 {
+	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
+	
+	// GLint bufMask = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
+	// pc.pts = (VertexData *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, nodeSize * sizeof(VertexData), bufMask);
 
 	index->buildIndex();
 
-	// float k = (float)std::sqrt((AREA_MULTIPLICATOR * area) / (1.f + nodeSize));
-	float maxDisplace = (float)(std::sqrt(500 * area) / 10.f); // Déplacement limite : on peut le calibrer...
-
-	float k = (float)std::sqrt((500 * area) / (1.f + nodeSize));
+	float maxDisplace = (float)(std::sqrt(AREA_MULTIPLICATOR * area) / 10.f); // Déplacement limite : on peut le calibrer...
+	float k = (float)std::sqrt((AREA_MULTIPLICATOR * area) / nodeSize);
 
 	for (int i = 0; i < nodeSize; i++)
 	{
@@ -154,76 +159,155 @@ void FRModelImproved::UpdateNodes()
 		}
 
 		float query_pt[3] = {pc.pts[i].vertexPosition.x, pc.pts[i].vertexPosition.y, pc.pts[i].vertexPosition.z};
+		const float search_radius = 20000;
+		std::vector<std::pair<size_t, float>> ret_matches;
 
+		nanoflann::SearchParams params;
+		//params.sorted = false;
+
+		const size_t nMatches = index->radiusSearch(&query_pt[0], search_radius, ret_matches, params);
+
+		for (int j = 0; j < nMatches; j++)
 		{
-			size_t num_results = 25;
-			std::vector<size_t> ret_index(num_results);
-			std::vector<float> out_dist_sqr(num_results);
+			// int index = j;
+			size_t index = ret_matches[j].first;
+			float xDist = pc.pts[i].vertexPosition.x - pc.pts[index].vertexPosition.x;
+			float yDist = pc.pts[i].vertexPosition.y - pc.pts[index].vertexPosition.y;
+			float zDist = pc.pts[i].vertexPosition.z - pc.pts[index].vertexPosition.z;
+			float dist = 0;
 
-			num_results = index->knnSearch(&query_pt[0], num_results, &ret_index[0], &out_dist_sqr[0]);
-
-			// In case of less points in the tree than requested:
-			ret_index.resize(num_results);
-			// out_dist_sqr.resize(num_results);
-			for (int j = 0; j < num_results; j++)
+			if (config->graphType3d)
 			{
+				dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+			}
+			else
+			{
+				dist = std::sqrt(xDist * xDist + yDist * yDist);
+			}
 
-				float xDist = pc.pts[i].vertexPosition.x - pc.pts[ret_index[j]].vertexPosition.x;
-				float yDist = pc.pts[i].vertexPosition.y - pc.pts[ret_index[j]].vertexPosition.y;
-				float zDist = pc.pts[i].vertexPosition.z - pc.pts[ret_index[j]].vertexPosition.z;
-				float dist = 0;
-
+			if (dist > 0)
+			{
+				float repulsive = (k * k) / dist;
+				pc.pts[i].dx += area * NEIGHBOR_FORCE_MULTIPLICATOR * xDist / dist * repulsive;
+				pc.pts[i].dy += area * NEIGHBOR_FORCE_MULTIPLICATOR * yDist / dist * repulsive;
 				if (config->graphType3d)
-				{
-					dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
-				}
-				else
-				{
-					dist = std::sqrt(xDist * xDist + yDist * yDist);
-				}
-
-				if (dist > 0)
-				{
-					float repulsive = (k * k) / dist;
-					pc.pts[i].dx += xDist / dist * repulsive;
-					pc.pts[i].dy += yDist / dist * repulsive;
-					if (config->graphType3d)
-						pc.pts[i].dz += zDist / dist * repulsive;
-				}
+					pc.pts[i].dz += area * NEIGHBOR_FORCE_MULTIPLICATOR * zDist / dist * repulsive;
 			}
 		}
 	}
 
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
+	auto edgeSize = (*fromToConnections).size();
+	for (int i = 0; i < edgeSize; i++)
+	{
+		auto source = pc.pts[(*fromToConnections)[i].from];
+		auto target = pc.pts[(*fromToConnections)[i].to];
+
+		float xDist = source.vertexPosition.x - target.vertexPosition.x;
+		float yDist = source.vertexPosition.y - target.vertexPosition.y;
+		float zDist = source.vertexPosition.z - target.vertexPosition.z;
+		float dist = 0;
+
+		if (config->graphType3d)
+		{
+			dist = std::sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+		}
+		else
+		{
+			dist = std::sqrt(xDist * xDist + yDist * yDist);
+		}
+
+		if (dist > 0)
+		{
+			float atractive = (dist * dist) / k;
+			source.dx -= xDist / dist * atractive;
+			source.dy -= yDist / dist * atractive;
+
+			target.dx += xDist / dist * atractive;
+			target.dy += yDist / dist * atractive;
+
+			if (config->graphType3d)
+			{
+				source.dz -= zDist / dist * atractive;
+				target.dz += zDist / dist * atractive;
+			}
+
+			pc.pts[(*fromToConnections)[i].from] = source;
+			pc.pts[(*fromToConnections)[i].to] = target;
+		}
+	}
+
+	for (int i = 0; i < nodeSize; i++)
+	{
+		auto pos = pc.pts[i];
+		float d = 0;
+		if (config->graphType3d)
+		{
+			d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y + pos.vertexPosition.z * pos.vertexPosition.z));
+		}
+		else
+		{
+			d = std::sqrt((pos.vertexPosition.x * pos.vertexPosition.x + pos.vertexPosition.y * pos.vertexPosition.y));
+		}
+		float gf = 0.01f * k * (float)gravity * d;
+
+		pos.dx -= gf * pos.vertexPosition.x / d;
+		pos.dy -= gf * pos.vertexPosition.y / d;
+		pos.dz -= gf * pos.vertexPosition.z / d;
+
+		pos.dx *= speed / SPEED_DIVISOR;
+		pos.dy *= speed / SPEED_DIVISOR;
+		pos.dz *= speed / SPEED_DIVISOR;
+
+		if (config->graphType3d)
+		{
+			d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy + pos.dz * pos.dz));
+		}
+		else
+		{
+			d = std::sqrt((pos.dx * pos.dx + pos.dy * pos.dy));
+		}
+
+		if (d > 0)
+		{
+
+#ifdef _WIN32
+			float limitedDist = min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+#else
+			float limitedDist = std::min(maxDisplace * ((float)speed / SPEED_DIVISOR), d);
+#endif
+
+			pos.vertexPosition.x = pos.vertexPosition.x + pos.dx / d * limitedDist;
+			pos.vertexPosition.y = pos.vertexPosition.y + pos.dy / d * limitedDist;
+			if (config->graphType3d)
+			{
+				pos.vertexPosition.z = pos.vertexPosition.z + pos.dz / d * limitedDist;
+			}
+			else
+			{
+				pos.vertexPosition.z = 0;
+			}
+		}
+		pc.pts[i] = pos;
+	}
+
 	glBufferData(GL_SHADER_STORAGE_BUFFER, nodeSize * sizeof(VertexData), &pc.pts[0], GL_DYNAMIC_DRAW);
 
-	// // repulsive
-	// glUseProgram(repulsiveCompute->GetShaderProgram());
-	// glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
-	// PassUniforms(repulsiveCompute->GetShaderProgram());
+	// //attractive
+	// glUseProgram(attractiveCompute->GetShaderProgram());
+	// PassUniforms(attractiveCompute->GetShaderProgram());
+	// glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
 	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-	//attractive
-	glUseProgram(attractiveCompute->GetShaderProgram());
-	PassUniforms(attractiveCompute->GetShaderProgram());
-	glDispatchCompute((fromToConnectionSize / GROUP_SIZE) + 1, 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-	//update
-	glUseProgram(updateCompute->GetShaderProgram());
-	PassUniforms(updateCompute->GetShaderProgram());
-	glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
-	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-	GLint bufMask = GL_MAP_WRITE_BIT;
-	// the invalidate makes a big difference when re-writing
-	pc.pts = (VertexData *)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, nodeSize * sizeof(VertexData), bufMask);
-	int i = 1;
+	// //update
+	// glUseProgram(updateCompute->GetShaderProgram());
+	// PassUniforms(updateCompute->GetShaderProgram());
+	// glDispatchCompute((nodeSize / GROUP_SIZE) + 1, 1, 1);
+	// glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void FRModelImproved::UpdateEdges()
+void FRModelCpuKdTree::UpdateEdges()
 {
 
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, edgeSsbo);
@@ -237,7 +321,7 @@ void FRModelImproved::UpdateEdges()
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void FRModelImproved::PassUniforms(GLuint shader)
+void FRModelCpuKdTree::PassUniforms(GLuint shader)
 {
 	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
 	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
@@ -248,7 +332,7 @@ void FRModelImproved::PassUniforms(GLuint shader)
 	glUniform1iv(17, 1, &graphType);
 }
 
-void FRModelImproved::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModelCpuKdTree::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	DrawNodes(projection_matrix, view_matrix, cameraPosition);
 
@@ -258,10 +342,9 @@ void FRModelImproved::Draw(const glm::mat4 &projection_matrix, const glm::mat4 &
 	};
 }
 
-void FRModelImproved::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModelCpuKdTree::DrawNodes(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, nodeSsbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, nodeSize * sizeof(VertexData), &pc.pts[0], GL_DYNAMIC_DRAW);
 
 	glUseProgram(nodeShader->GetShaderProgram());
 
@@ -278,7 +361,7 @@ void FRModelImproved::DrawNodes(const glm::mat4 &projection_matrix, const glm::m
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
-void FRModelImproved::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
+void FRModelCpuKdTree::DrawEdges(const glm::mat4 &projection_matrix, const glm::mat4 &view_matrix, const glm::vec3 &cameraPosition)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, edgeSsbo);
 
@@ -296,7 +379,7 @@ void FRModelImproved::DrawEdges(const glm::mat4 &projection_matrix, const glm::m
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void FRModelImproved::DrawGui()
+void FRModelCpuKdTree::DrawGui()
 {
 	ImGui::Begin("Graph settings");
 	{
@@ -325,7 +408,7 @@ void FRModelImproved::DrawGui()
 	ImGui::End();
 }
 
-void FRModelImproved::Clear()
+void FRModelCpuKdTree::Clear()
 {
 	glDeleteBuffers(1, &nodeSsbo);
 	glDeleteBuffers(1, &edgeSsbo);
