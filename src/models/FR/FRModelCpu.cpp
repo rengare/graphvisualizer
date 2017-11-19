@@ -216,7 +216,7 @@ void FRModelCpu::FruchtermanReingold()
 			(*bufferVertices)[i].vertexPosition.z = 1;
 		}
 
-		for (int j = 0; j < nodeSize; j++)
+		for (int j = i + 1; j < nodeSize; j++)
 		{
 			if (i != j)
 			{

@@ -88,13 +88,14 @@ int main(int argc, char *argv[])
 
     int hostArrayIndex = 0;
 
+    int range = 100;
     for (int i = 0; i < uniqueEdge.size(); i++)
     {
-        nodeData[i].vertexPosition.x = RandomNumberGenerator(-1000, 1000);
-        nodeData[i].vertexPosition.y = RandomNumberGenerator(-1000, 1000);
+        nodeData[i].vertexPosition.x = RandomNumberGenerator(-range, range);
+        nodeData[i].vertexPosition.y = RandomNumberGenerator(-range, range);
         if (config.graphType3d)
         {
-            nodeData[i].vertexPosition.z = RandomNumberGenerator(-1000, 1000);
+            nodeData[i].vertexPosition.z = RandomNumberGenerator(-range, range);
         }
         else
         {

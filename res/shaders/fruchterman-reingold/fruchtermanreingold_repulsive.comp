@@ -82,7 +82,7 @@ void main(void)
     }
 
     vec3 t = vec3(0.0);
-    for (uint j = 0; j < graphDataSize; j++)
+    for (uint j = gl_GlobalInvocationID.x + 1; j < graphDataSize; j++)
     {
         
         if (globalIndex != j)

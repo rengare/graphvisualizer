@@ -65,39 +65,39 @@ shared vec4 cache[gl_WorkGroupSize.x];
 
 void main(void)
 {
-    float k;
-    uint globalIndex = gl_GlobalInvocationID.x;
+    // float k;
+    // uint globalIndex = gl_GlobalInvocationID.x;
     
-    uint N = gl_NumWorkGroups.x*gl_WorkGroupSize.x;
+    // uint N = gl_NumWorkGroups.x*gl_WorkGroupSize.x;
     
-    if(globalIndex > graphDataSize) return;
+    // if(globalIndex > graphDataSize) return;
 
-    GraphicData currentModel = data[globalIndex];
-    currentModel.dx = 0;
-    currentModel.dy = 0;
-    currentModel.dz = 0;
+    // GraphicData currentModel = data[globalIndex];
+    // currentModel.dx = 0;
+    // currentModel.dy = 0;
+    // currentModel.dz = 0;
 
-    k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
+    // k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
 
-    if(graphType3d == 1 && currentModel.position.z == 0.0){
-        currentModel.position.z = 1;
-    }
+    // if(graphType3d == 1 && currentModel.position.z == 0.0){
+    //     currentModel.position.z = 1;
+    // }
 
-    vec3 t = vec3(0.0);
-    for (uint j = 0; j < gl_NumWorkGroups.x * gl_WorkGroupSize.x; j += gl_WorkGroupSize.x)
-    {
-        if(gl_LocalInvocationIndex + j >= graphDataSize) break;
+    // vec3 t = vec3(0.0);
+    // for (uint j = 0; j < gl_NumWorkGroups.x * gl_WorkGroupSize.x; j += gl_WorkGroupSize.x)
+    // {
+    //     if(gl_LocalInvocationIndex + j >= graphDataSize) break;
 
-        cache[gl_LocalInvocationIndex] = data[gl_LocalInvocationIndex + j].position;
+    //     cache[gl_LocalInvocationIndex] = data[gl_LocalInvocationIndex + j].position;
         
-        for(uint i = 0; i< gl_WorkGroupSize.x; i++){
-            t += repulsion(currentModel.position, cache[i], k*k);   
+    //     for(uint i = 0; i< gl_WorkGroupSize.x; i++){
+    //         t += repulsion(currentModel.position, cache[i], k*k);   
 
-        }
-    }
+    //     }
+    // }
     
-    currentModel.dx = t.x;
-    currentModel.dy = t.y;
-    currentModel.dz = t.z;
-    data[globalIndex] = currentModel;
+    // currentModel.dx = t.x;
+    // currentModel.dy = t.y;
+    // currentModel.dz = t.z;
+    // data[globalIndex] = currentModel;
 }
