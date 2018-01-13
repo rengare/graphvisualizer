@@ -262,7 +262,7 @@ void App::RenderGui()
     {
 
         string nodeSizeText = "nodes count: " + to_string(nodeCount);
-        string edgeSizeText = "edges count: " + to_string(edgeCount);
+        string edgeSizeText = "edges count: " + to_string(edgeCount / 2);
         string durationText = "algorithm duration: " + to_string(duration);
         ImGui::Text(nodeSizeText.c_str());
         ImGui::Text(edgeSizeText.c_str());

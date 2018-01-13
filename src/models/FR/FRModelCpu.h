@@ -72,8 +72,8 @@ class FRModelCpu : public IModel
     float SPEED_DIVISOR = 800;
     float AREA_MULTIPLICATOR = 10000;
     float speed = 100.0;
-    float area = 100.0;
-    float gravity = 10.0;  
+    float area = 1000.0;
+    float gravity = 1.0;  
 };
 
 #endif
