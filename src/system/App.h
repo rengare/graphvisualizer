@@ -12,6 +12,7 @@
 #include <map>
 #include <math.h>
 #include <sstream>
+#include <chrono>
 
 #include "input/InputManager.h"
 #include "../graphic/camera/Camera.h"
@@ -87,12 +88,16 @@ private:
   int nodeCount;
   int edgeCount;
   int nodeIndex = 0;
-
+  unsigned int duration = 0;
   int currentNodeIteration = 0;
   int currentEdgeIteration = 0;
 
   int algorithmIndex = 0;
   int skip = 0;
+
+  std::chrono::high_resolution_clock::time_point start;
+
+  bool startClock = false;
 };
 
 #endif

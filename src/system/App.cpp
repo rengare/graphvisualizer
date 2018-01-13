@@ -73,7 +73,6 @@ void App::Run()
 void App::Update()
 {
     ProcessInput();
-    // Fruchterman_Reingold();
     if (graphModel != nullptr && skip > 1)
     {
         graphModel->Update();
@@ -264,8 +263,10 @@ void App::RenderGui()
 
         string nodeSizeText = "nodes count: " + to_string(nodeCount);
         string edgeSizeText = "edges count: " + to_string(edgeCount);
+        string durationText = "algorithm duration: " + to_string(duration);
         ImGui::Text(nodeSizeText.c_str());
         ImGui::Text(edgeSizeText.c_str());
+        ImGui::Text(durationText.c_str());
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
                     ImGui::GetIO().Framerate);
 
@@ -300,7 +301,18 @@ void App::RenderGui()
         ImGui::Checkbox("Show edge", &config.showEdge);
         ImGui::SameLine();
 
-        ImGui::Checkbox("Update", &config.isUpdateOn);
+        if(ImGui::Checkbox("Update", &config.isUpdateOn)){
+            if(config.isUpdateOn && !startClock){
+                startClock = true;
+                start = std::chrono::high_resolution_clock::now();
+            }
+
+            if(!config.isUpdateOn && startClock){
+                startClock = false;
+                auto current_time = std::chrono::high_resolution_clock::now();
+                duration = std::chrono::duration_cast<std::chrono::seconds>(current_time - start).count();
+            }
+        }
         ImGui::SameLine();
 
         ImGui::Checkbox("3d", &config.graphType3d);
