@@ -20,5 +20,5 @@
     "nodeShaderFragmentPath": "res/shaders/circle.frag",
     "lineShaderVertexPath": "res/shaders/line.vert",
     "lineShaderFragmentPath": "res/shaders/line.frag",
-    "edgeInput": "array.edges"
+    "edgeInput": "data/Cit-HepPh.txt"
 }

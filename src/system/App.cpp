@@ -74,7 +74,6 @@ void App::Update()
 {
     ProcessInput();
     // Fruchterman_Reingold();
-
     if (graphModel != nullptr && skip > 1)
     {
         graphModel->Update();

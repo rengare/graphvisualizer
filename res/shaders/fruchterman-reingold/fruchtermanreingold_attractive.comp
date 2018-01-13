@@ -48,37 +48,36 @@ float distSqrt(vec4 pos){
 
 void main(void)
 {
-    float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
     float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
 
     uint globalIndex = gl_GlobalInvocationID.x;
     
     if(globalIndex > connectionSize) return;
 
-        GraphicData source = data[connections[globalIndex].from];
-        GraphicData target = data[connections[globalIndex].to];
+    GraphicData source = data[connections[globalIndex].from];
+    GraphicData target = data[connections[globalIndex].to];
 
-        float xDist = source.position.x - target.position.x;
-        float yDist = source.position.y - target.position.y;
-        float zDist = source.position.z - target.position.z;
+    float xDist = source.position.x - target.position.x;
+    float yDist = source.position.y - target.position.y;
+    float zDist = source.position.z - target.position.z;
 
-        float dist = distSqrt(vec4(xDist, yDist, zDist, 0));
+    float dist = distSqrt(vec4(xDist, yDist, zDist, 0));
 
-        if (dist > 0)
-        {
-            float atractive = (dist * dist) / k;
-            source.dx -= xDist / dist * atractive;
-            source.dy -= yDist / dist * atractive;
+    if (dist > 0)
+    {
+        float atractive = (dist * dist) / k;
+        source.dx -= xDist / dist * atractive;
+        source.dy -= yDist / dist * atractive;
 
-            target.dx += xDist / dist * atractive;
-            target.dy += yDist / dist * atractive;
-            
-            if(graphType3d == 1){
-                source.dz -= zDist / dist * atractive;
-                target.dz += zDist / dist * atractive;
-            }
-
-            data[connections[globalIndex].from] = source;
-            data[connections[globalIndex].to] = target;
+        target.dx += xDist / dist * atractive;
+        target.dy += yDist / dist * atractive;
+        
+        if(graphType3d == 1){
+            source.dz -= zDist / dist * atractive;
+            target.dz += zDist / dist * atractive;
         }
+
+        data[connections[globalIndex].from] = source;
+        data[connections[globalIndex].to] = target;
+    }
 }

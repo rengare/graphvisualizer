@@ -14,7 +14,7 @@ FRModel::FRModel(AppConfig *config, vector<VertexData> *nodeData, vector<VertexD
 {
 	this->nodeShader = new Shader(config->nodeShaderName, config->nodeShaderVertexPath, config->nodeShaderFragmentPath);
 	this->edgeShader = new Shader(config->lineShaderName, config->lineShaderVertexPath, config->lineShaderFragmentPath);
-
+	
 	this->repulsiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_repulsive.comp");
 	this->attractiveCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_attractive.comp");
 	this->updateCompute = new ComputeShader("res/shaders/fruchterman-reingold/fruchtermanreingold_positionupdate.comp");
@@ -80,7 +80,6 @@ void FRModel::PrepareNodes()
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, nodeSsbo);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, fromToSsbo);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 15, repulsiveSsbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -168,9 +167,8 @@ void FRModel::UpdateEdges()
 
 void FRModel::PassUniforms(GLuint shader)
 {
-	glUniform1iv(glGetUniformLocation(shader, "graphDataSize"), 1, &nodeSize);
-	glUniform1iv(glGetUniformLocation(shader, "connectionSize"), 1, &fromToConnectionSize);
-	
+	glUniform1iv(1, 1, &nodeSize);
+	glUniform1iv(9, 1, &fromToConnectionSize);
 	glUniform1fv(11, 1, &speed);
 	glUniform1fv(12, 1, &area);
 	glUniform1fv(13, 1, &gravity);

@@ -40,61 +40,57 @@ layout( location = 9 ) uniform int connectionSize;
 
 shared vec4 localPositions[ gl_WorkGroupSize.x ];
 
-float distSqrt(vec4 pos){
+float distSqrt(vec4 node){
     if(graphType3d == 1){
-        return sqrt((pow(pos.x, 2) + pow(pos.y, 2) + pow(pos.z, 2)));
+        return sqrt((pow(node.x, 2) + pow(node.y, 2) + pow(node.z, 2)));
     }else{
-        return sqrt((pow(pos.x, 2) + pow(pos.y, 2)));
+        return sqrt((pow(node.x, 2) + pow(node.y, 2)));
     }
 }
 
 vec4 positionUpdate(GraphicData model, float d, float limitedDist){
     vec4 position = vec4(0);
 
-        position.x = model.position.x + model.dx / d * limitedDist;
-        position.y = model.position.y + model.dy / d * limitedDist;
-        if(graphType3d == 1){
-            position.z = model.position.z + model.dz / d * limitedDist;
-        }else{
-            position.z = 0;
-        }
+    position.x = model.position.x + model.dx / d * limitedDist;
+    position.y = model.position.y + model.dy / d * limitedDist;
+    if(graphType3d == 1){
+        position.z = model.position.z + model.dz / d * limitedDist;
+    }else{
+        position.z = 0;
+    }
 
     return position;
 }
 
 void main(void)
 {
-    float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
-    float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
 
     uint globalIndex = gl_GlobalInvocationID.x;
     uint localIndex =  gl_LocalInvocationID.x;
     
     if(globalIndex > graphDataSize) return;
 
-    GraphicData pos = data[globalIndex];
-
-
-    float d = distSqrt(pos.position);
-        
+    GraphicData node = data[globalIndex];
+    float maxDisplace = (sqrt(AREA_MULTIPLICATOR * area) / 10.0);
+    float k = ((AREA_MULTIPLICATOR * area) / (1.0 + graphDataSize));
+    float d = distSqrt(node.position);
     float gf = 0.01 * k * gravity * d;
 
-    pos.dx -= gf * pos.position.x / d;
-    pos.dy -= gf * pos.position.y / d;
-    pos.dz -= gf * pos.position.z / d;
+    node.dx -= gf * node.position.x / d;
+    node.dy -= gf * node.position.y / d;
+    node.dz -= gf * node.position.z / d;
     
-    pos.dx *= speed / SPEED_DIVISOR;
-    pos.dy *= speed / SPEED_DIVISOR;
-    pos.dz *= speed / SPEED_DIVISOR;
+    node.dx *= speed / SPEED_DIVISOR;
+    node.dy *= speed / SPEED_DIVISOR;
+    node.dz *= speed / SPEED_DIVISOR;
     
-
-    d = distSqrt(vec4(pos.dx, pos.dy, pos.dz, 0));
+    d = distSqrt(vec4(node.dx, node.dy, node.dz, 0));
     
     if (d > 0)
     {
         float limitedDist = min(maxDisplace * (speed / SPEED_DIVISOR), d);
-        pos.position = positionUpdate(pos, d, limitedDist);
+        node.position = positionUpdate(node, d, limitedDist);
     }
 
-    data[globalIndex] = pos;
+    data[globalIndex] = node;
 }

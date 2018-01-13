@@ -5,6 +5,7 @@ layout (local_size_x = GROUPSIZE) in;
 
 float AREA_MULTIPLICATOR = 500;
 
+layout( location = 1 ) uniform int graphDataSize;
 layout( location = 11 ) uniform float speed;
 layout( location = 12 ) uniform float area;
 layout( location = 13 ) uniform float gravity;
@@ -36,8 +37,6 @@ layout (std430, binding = 8) buffer DataConnections
 	Connections connections[];
 };
 
-layout( location = 1 ) uniform int graphDataSize;
-
 vec3 distance(vec4 currentPosition, vec4 cachedPosition){
     return currentPosition.xyz - cachedPosition.xyz;
 }
@@ -58,7 +57,6 @@ vec3 repulsion(vec4 currentPosition, vec4 cachedPosition, float k){
     }else{
         return vec3(0);
     }
-    
 }
 
 void main(void)

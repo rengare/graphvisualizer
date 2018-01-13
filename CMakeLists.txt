@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(graphvisualizer)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 IF (WIN32)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/windows")        

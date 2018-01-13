@@ -22,6 +22,10 @@ layout (std430, binding = 0) buffer DataBuffer
 	GraphicData data[];
 };
 
+
+layout( location = 1 ) uniform int graphDataSize;
+layout( location = 9 ) uniform int connectionSize;
+
 layout (std430, binding = 11) buffer LineBuffer 
 {
 	GraphicData lines[];
@@ -32,12 +36,8 @@ layout (std430, binding = 8) buffer DataConnections
 	Connections connections[];
 };
 
-layout( location = 1 ) uniform int graphDataSize;
-layout( location = 9 ) uniform int connectionSize;
-
 void main(void)
 {
-
     uint globalIndex = gl_GlobalInvocationID.x;
     if(globalIndex > connectionSize) return;
 
